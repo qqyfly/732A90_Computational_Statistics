@@ -31,6 +31,51 @@ function g.}
 
 \textbf{\textcolor{blue}{Answer:}} 
 
+\textbf{a}
+
+We have
+
+$g(x,y)=-x^{2}-x^{2}y^{2}-2xy+2x+2$
+
+So 
+
+$$
+ \begin{bmatrix} 
+  -2-2y^2 & -4xy-2 \\
+  -4xy-2 & 0
+ \end{bmatrix} 
+$$
+
+```{R q1a ,include=FALSE}
+g <- function(x,y)
+{
+  ret <- - x^2 - x^2 * y^2 - 2 * x * y + 2 * x + 2
+  return(ret)
+}
+
+x <- seq(-3, 3, by = 0.01)
+y <- seq(-3, 3, by = 0.01)
+
+dx <- length(x)
+dy <- length(y)
+
+gx <- matrix(rep(NA, dx*dy), nrow=dx,ncol=dy)
+
+for (i in 1:dx){
+  for (j in 1:dy)
+  {
+    gx[i,j] <- g(x[i],y[j])
+  }
+}
+
+\textbf{b}
+
+
+
+contour(x,y,gx)
+
+```
+
 ## Question 2: Optimisation of a two-dimensional function
 
 Three doses $(0.1, 0.3,$ and $0.9 $g$) of a drug and placebo (0 $g$) are tested in a study. A dose-dependent event is recorded afterwards. The data of $n = 10$ subjects is shown in Table 1; xi is the dose in gram; $y_{i} = 1$ if the event occurred, $y_{i} = 0$ otherwise.
