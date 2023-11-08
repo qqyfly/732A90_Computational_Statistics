@@ -5,8 +5,8 @@ g <- function(x,y)
 }
 # First derivative
 dg <- function(x){
-  ret <- matrix(data = c(-2 * x -2 * x * y^2 + 2*x  + 2,0,-2 * x^2 -2 * x,0),
-                ncol = 2,nrow = 2)
+  ret <- matrix(data = c(-2 * x -2 * x * y^2 + 2*x  + 2,-2 * x^2 -2 * x),
+                ncol = 1,nrow = 2)
 }
 # Second derivative
 d2g <- function(x){
@@ -21,7 +21,7 @@ newton <- function(x0, eps=0.0001){
   while(abs(xt-xt1)>eps)
   {
     xt1 <- xt
-    xt  <- xt1 - dg(xt1)/d2g(xt1)
+    xt  <- xt1 -  solve(d2g(xt1)) %*% dg(xt1)
     print(xt) 
   }
   xt
