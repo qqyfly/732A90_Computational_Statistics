@@ -55,11 +55,15 @@ newton <- function(x0, eps = 1e-10, max_step = 1000) {
     if (step > max_step) {
       break
     }else {
+
+      test <- dg(xt0[1], xt0[2])
+      print(test)
+
       xt1  <- xt0 - solve(d2g(xt0[1], xt0[2])) %*% dg(xt0[1], xt0[2])
       #old_criterion <- criterion 
       criterion <- distance(xt1, xt0)
 
-      cat(criterion, "->")
+      #cat(criterion, "->")
 
       xt0 <- xt1
       step <- step + 1
@@ -92,6 +96,16 @@ newton_value_4 <- newton(matrix(c(0, 2), nrow = 2, ncol = 1))
 # Since our newton_value_1 to newton_value_4 are not NA, we can calculate the
 # Gradient vector and Hessian matrix of g at these points listed as table below.
 
+gradient_1 <- g(2, 0)
+gradient_2 <- g(-1, 2)
+gradient_3 <- g(0, -1)
+gradient_4 <- g(0, 2)
+
+hessian_1 <-  g(2, 0)
+hessian_2 <-  g(-1, 2)
+hessian_3 <-  g(0, -1)
+hessian_4 <-  g(0, 2)
+
 #  |        | Gradient | Hessian           |  Type  |
 #  |:---:   |:---:     |:---:              |        |
 #  |(2, 0)  | -2 \\ -4 |  2 & -2 \\ -2 & 8 |        |
@@ -106,7 +120,7 @@ newton_value_4 <- newton(matrix(c(0, 2), nrow = 2, ncol = 1))
 ########################## [ 1 d] #############################################
 # The advantages of the steepest ascent algorithm is that it is easy to
 # calculate without need to consider about the second derivative of the
-# function. Newton method not guaranteed that g(x) will increase every single 
+# function. Newton method not guaranteed that g(x) will increase every single
 # step.
 
 # However, the steepest ascent algorithm is not as efficient as the
