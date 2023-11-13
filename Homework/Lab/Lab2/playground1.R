@@ -58,22 +58,22 @@ newton <- function(x0, eps = 1e-10, max_step = 1000) {
   xt0  <- x0
   xt1 <- x0 + 5
   step <- 1
-  criterion = 100
+  criterion <- 100
   while (criterion > eps) {
     if (step > max_step) {
       break
     }else {
       xt1  <- xt0 - solve(d2g(xt0[1], xt0[2])) %*% dg(xt0[1], xt0[2])
-      old_criterion <- criterion 
-      criterion <- distance(xt1,xt0)
-      
-      cat(criterion,"->")
-      
+      #old_criterion <- criterion 
+      criterion <- distance(xt1, xt0)
+
+      cat(criterion, "->")
+
       xt0 <- xt1
       step <- step + 1
     }
   }
- 
+
   if (step > max_step) {
     print("The maximum step is reached.")
     return(NA)

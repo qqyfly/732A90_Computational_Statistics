@@ -11,14 +11,13 @@ g <- function(x, y, b0, b1) {
 
 # First derivative
 dg <- function(x, y, b0, b1) {
-  
   ret <- matrix(data = c(-2 * x - 2 * x * y^2 + 2 * x  + 2, -2 * x^2 - 2 * x),
                 ncol = 1, nrow = 2)
   return(ret)
 }
 
-ml_estimator <- function(x,) {
-    
+steepest_ascent <- function(x,) {
+
 }
 
 ################################################################################
