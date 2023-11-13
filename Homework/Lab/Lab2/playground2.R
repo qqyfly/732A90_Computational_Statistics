@@ -143,15 +143,14 @@ result_nelder_mead <- optim(par = beta_init, g, dg, method = 'Nelder-Mead',
 # The result of the function and the gradient of the function using the 
 # parameters calculated by above methods are as follows:
 
-#  |             | b0       | b1      |  g     | g'    |
-#  |:---:        |:---:     |:---:    | :---:  |:---:  |
-#  | Own method  |          |         |        |       |
-#  | BFGS        |          |         |        |       |
-#  | Nelder-Mead |          |         |        |       |
-
+#  |             | b0         | b1        |  g      | g'                           |
+#  |:---:        |:---:       |:---:      | :---:   |:---:                         |
+#  | Own method  |0.0169513   |1.1952562  |-6.484974|(-0.01309331, -0.01178398)    |
+#  | BFGS        |0.01248138  |1.19123325 |-6.485018|(-1.610715e-07, -1.449644e-07)|
+#  | Nelder-Mead |-0.009423433|1.262738266|-6.484279|(0.0002044366, 0.0001839929)  |
+#  | glm         |-0.00936    |1.26282    |-6.484279|(2.714971e-06, 2.443474e-06)  |
 
 ################################################################################
-
 
 ########################## [ 2 d ] #############################################
 # We use glm to obtain the optimal parameters. code as below.
@@ -161,10 +160,11 @@ fit <- glm(y ~ x, family = binomial(link = 'logit'), data = data)
 summary(fit)
 ################################################################################
 
-# Compare to the result from the output of optim function, we have the same.
+# Compare to the result from the output of optim function, all the results are
+# near (0, 1.2)
 
-#  |             | output   |
-#  |:---:        |:---:     |
+#  |             | output                     |
+#  |:---:        |:---:                       |
 #  | Own method  | (0.0169513,1.1952562)      |
 #  | BFGS        | (0.01248138,1.19123325)    |
 #  | Nelder-Mead | (-0.009423433,1.262738266) |
