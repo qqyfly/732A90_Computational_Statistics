@@ -16,6 +16,7 @@ dg <- function(x, y) {
                 ncol = 1, nrow = 2)
   return(ret)
 }
+
 # Second derivative
 d2g <- function(x, y) {
   ret <- matrix(data = c(-2 * y^2 - 2, -4 * x * y - 2,
@@ -24,14 +25,13 @@ d2g <- function(x, y) {
   return(ret)
 }
 
-# Contour plot using the following code.
+# Draw contour plot
 n <- 3
 x <- seq(-n, n, by = 0.01)
 y <- seq(-n, n, by = 0.01)
 dx <- length(x)
 dy <- length(y)
 gx <- matrix(rep(NA, dx * dy), nrow = dx, ncol = dy)
-
 gx <- sapply(y, function(i) sapply(x, function(j) g(i, j)))
 
 contour(x, y, gx, nlevels = 7, col = "blue")
@@ -39,28 +39,27 @@ contour(x, y, gx, nlevels = 7, col = "blue")
 
 
 ########################## [ 1 b ] #############################################
-# we can get a local maximum of g by using the following code.
-
+# define distance of two points
 distance <- function(xt1, xt0) {
   ret <- t(xt1 - xt0) %*% (xt1 - xt0)
   return(ret[1][1])
 }
 
+# newton function with eps = 1e-8 and max_step = 1000
+# x0 is the initial value
 newton <- function(x0, eps = 1e-8, max_step = 1000) {
   xt0  <- x0
-  xt1 <- x0 + 5
-  criterion <- 100
-
   for (i in 1:max_step){
     xt1  <- xt0 - solve(d2g(xt0[1], xt0[2])) %*% dg(xt0[1], xt0[2])
     criterion <- distance(xt1, xt0)
+    # we get the qualified result
     if (criterion < eps) {
       cat("Converged after ", i, " steps\n")
       return(xt1)
     }
     xt0 <- xt1
   }
-
+  # after max_step steps, we still cannot get the qualified result
   cat("Did not converge after", max_step, " steps\n")
 }
 ################################################################################
@@ -68,21 +67,21 @@ newton <- function(x0, eps = 1e-8, max_step = 1000) {
 
 ########################## [ 1 c ] #############################################
 # let's use (2,0),(-1,2),(0,-1) and (0,2) as initial values.
-# and we get the following results.
+# and we get the following results using the newton function above.
 
-# we use the default eps = 0.0001 and max_step here.
+# we use the default and max_step.
 newton_value_1 <- newton(matrix(c(2, 0), nrow = 2, ncol = 1))
 newton_value_2 <- newton(matrix(c(-1, 2), nrow = 2, ncol = 1))
 newton_value_3 <- newton(matrix(c(0, -1), nrow = 2, ncol = 1))
 newton_value_4 <- newton(matrix(c(0, 2), nrow = 2, ncol = 1))
 
-# We can find the following results.
+# We find the following results.
 # (1,-1),(7.022621e-12,1),(0,1),(0,1)
 
-# It seems that we have 2 points (1,-1)(point 1) and (0,1)(point 2-4)
+# It seems that we have 2 points (1,-1)(init point 1) and (0,1)(init point 2-4)
 
-# we can calculate the Gradient vector and Hessian matrix of g at these points 
-# listed as table below.
+# we can calculate the Gradient vector and Hessian matrix of g at these points
+# using dg and d2g function defined above. The result is as follows.
 
 gradient_1 <- dg(1, -1)
 gradient_2 <- dg(-0, 1)
@@ -115,10 +114,14 @@ check_type(hessian_2)
 ########################## [ 1 d] #############################################
 # The advantages of the steepest ascent algorithm is that it is easy to
 # calculate without need to consider about the second derivative of the
-# function. Newton method not guaranteed that g(x) will increase every single
-# step.
+# function. But the steepest ascent algorithm is not as efficient as the
+# Newton method.
 
-# However, the steepest ascent algorithm is not as efficient as the
-# newton method. If we implement it using newton method, with hessian matrix,
-# we can find the most steepest route to the maximum point from the start point.
+# Newton method, can get the answer much faster than other methods,however, it
+# cannot guaranteed that g(x) will increase every single step. And we have to
+# calculate the second derivative of the function. Another thing we need to
+# mention is that we have to choose a proper initial value to get a convergent
+# result. If we choose a bad initial value, we may get a diverge result since
+# the Newton method is sensitive to the initial value.
+
 ################################################################################
