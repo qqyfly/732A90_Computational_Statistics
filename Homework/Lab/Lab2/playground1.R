@@ -1,7 +1,7 @@
 ########################## [ 1 a ] #############################################
 # The gradient and the Hessian matrix is as follows
-# Gradient of g = (-2x - 2xy^2 + 2y + 2, -2x^2y - 2x)
-# Hessian of g = (-2y^2 + 2, -4xy - 2, -4xy - 2, -2x^2)
+# Gradient of g = (-2x - 2xy^2 - 2y + 2, -2x^2y - 2x)
+# Hessian of g = (-2y^2 - 2, -4xy - 2, -4xy - 2, -2x^2)
 
 # Function g
 g <- function(x, y) {
@@ -77,28 +77,36 @@ newton_value_3 <- newton(matrix(c(0, -1), nrow = 2, ncol = 1))
 newton_value_4 <- newton(matrix(c(0, 2), nrow = 2, ncol = 1))
 
 # We can find the following results.
+# (1,-1),(7.022621e-12,1),(0,1),(0,1)
 
-# It seems that not every initial values will lead to converge.
+# It seems that we have 2 points (1,-1)(point 1) and (0,1)(point 2-4)
 
-# Since our newton_value_1 to newton_value_4 are not NA, we can calculate the
-# Gradient vector and Hessian matrix of g at these points listed as table below.
+# we can calculate the Gradient vector and Hessian matrix of g at these points 
+# listed as table below.
 
-gradient_1 <- g(2, 0)
-gradient_2 <- g(-1, 2)
-gradient_3 <- g(0, -1)
-gradient_4 <- g(0, 2)
+gradient_1 <- dg(1, -1)
+gradient_2 <- dg(-0, 1)
 
-hessian_1 <-  g(2, 0)
-hessian_2 <-  g(-1, 2)
-hessian_3 <-  g(0, -1)
-hessian_4 <-  g(0, 2)
+hessian_1 <-  d2g(1, -1)
+hessian_2 <-  d2g(0, 1)
 
-#  |        | Gradient | Hessian           |  Type  |
-#  |:---:   |:---:     |:---:              |        |
-#  |(2, 0)  | -2 \\ -4 |  2 & -2 \\ -2 & 8 |        |
-#  |(-1, 2) | 8 \\ -2  |  -6 & 6 \\ 6 & -2 |        |
-#  |(0, -1) | 4 \\ 0   |  0 & -2 \\ -2 & 0 |        |
-#  |(0, 2)  | -2 \\ 0  |  -6 & -2\\ -2 & 0 |        |
+check_type <- function(hessian_matrix) {
+  eigenvalues <- eigen(hessian_matrix)$values
+  if (all(eigenvalues > 0)) {
+    cat("Local minimum\n")
+  } else if (all(eigenvalues < 0)) {
+    cat("Local maximum\n")
+  } else {
+    cat("Saddle point\n")
+  }
+}
+check_type(hessian_1)
+check_type(hessian_2)
+
+#  |  Point | Gradient | Hessian             |  Type        |
+#  |:---:   |:---:     |:---:                | :---:        |
+#  |(1, -1) | 0 & 0    |  -4 & 2  \\ 2  & -2 | Local maximum|
+#  |(0, 1)  | 0 & 0    |  -4 & -2 \\ -2 & 0  | Saddle point |
 
 # According to the table above and the contour plot, we can find that
 # point (0,1) are the global maximum if x,y \in [-3, 3] range.
