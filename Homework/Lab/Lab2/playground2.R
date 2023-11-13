@@ -128,7 +128,7 @@ steepest_ascent_2(beta_init)
 
 ########################## [ 2 c ] #############################################
 # According to the result, the two methods give the same result.
-# compare to the result from 2b, there is no difference.
+# compare to the result from 2b, there is almost no difference.
 
 # Use optim function (BFGS) to find the optimal parameters
 result_bfgs <- optim(par = beta_init, g, dg, method = 'BFGS', 
