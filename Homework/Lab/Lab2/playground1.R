@@ -18,7 +18,7 @@ dg <- function(x, y) {
 }
 # Second derivative
 d2g <- function(x, y) {
-  ret <- matrix(data = c(-2 * y^2 + 2, -4 * x * y - 2,
+  ret <- matrix(data = c(-2 * y^2 - 2, -4 * x * y - 2,
                          -4 * x * y - 2, -2 * x^2),
                 ncol = 2, nrow = 2)
   return(ret)
@@ -46,35 +46,22 @@ distance <- function(xt1, xt0) {
   return(ret[1][1])
 }
 
-newton <- function(x0, eps = 1e-10, max_step = 1000) {
+newton <- function(x0, eps = 1e-8, max_step = 1000) {
   xt0  <- x0
   xt1 <- x0 + 5
-  step <- 1
   criterion <- 100
-  while (criterion > eps) {
-    if (step > max_step) {
-      break
-    }else {
 
-      test <- dg(xt0[1], xt0[2])
-      print(test)
-
-      xt1  <- xt0 - solve(d2g(xt0[1], xt0[2])) %*% dg(xt0[1], xt0[2])
-      #old_criterion <- criterion 
-      criterion <- distance(xt1, xt0)
-
-      #cat(criterion, "->")
-
-      xt0 <- xt1
-      step <- step + 1
+  for (i in 1:max_step){
+    xt1  <- xt0 - solve(d2g(xt0[1], xt0[2])) %*% dg(xt0[1], xt0[2])
+    criterion <- distance(xt1, xt0)
+    if (criterion < eps) {
+      cat("Converged after ", i, " steps\n")
+      return(xt1)
     }
+    xt0 <- xt1
   }
 
-  if (step > max_step) {
-    print("The maximum step is reached.")
-    return(NA)
-  }
-  return(xt1)
+  cat("Did not converge after", max_step, " steps\n")
 }
 ################################################################################
 
