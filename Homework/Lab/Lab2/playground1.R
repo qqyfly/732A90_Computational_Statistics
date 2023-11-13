@@ -64,6 +64,7 @@ newton <- function(x0, eps = 1e-8, max_step = 1000) {
   }
   # after max_step steps, we still cannot get the qualified result
   cat("Did not converge after", max_step, " steps\n")
+  return(NULL)
 }
 ################################################################################
 
