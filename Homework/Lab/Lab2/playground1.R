@@ -1,7 +1,7 @@
 ########################## [ 1 a ] #############################################
 # The gradient and the Hessian matrix is as follows
-# Gradient of g = (-2x - 2xy^2 + 2x + 2, -2x^2 - 2x)
-# Hessian of g = (-2y^2, -4x - 2, -4x - 2, 0)
+# Gradient of g = (-2x - 2xy^2 + 2y + 2, -2x^2y - 2x)
+# Hessian of g = (-2y^2 + 2, -4xy - 2, -4xy - 2, -2x^2)
 
 # Function g
 g <- function(x, y) {
@@ -11,7 +11,7 @@ g <- function(x, y) {
 
 # First derivative
 dg <- function(x, y) {
-  ret <- matrix(data = c(-2 * x - 2 * x * y^2 - 2 * y  + 2, 
+  ret <- matrix(data = c(-2 * x - 2 * x * y^2 - 2 * y  + 2,
                          -2 * x^2 * y - 2 * x),
                 ncol = 1, nrow = 2)
   return(ret)
@@ -32,16 +32,8 @@ dx <- length(x)
 dy <- length(y)
 gx <- matrix(rep(NA, dx * dy), nrow = dx, ncol = dy)
 
-#gx <- sapply(1:length(x))
-#for (i in 1:dx){
-#  for (j in 1:dy){
-#    gx[i, j] <- g(x[i], y[j])
-#  }
-#}
-
 gx <- sapply(y, function(i) sapply(x, function(j) g(i, j)))
 
-#sapply(1:length(x), function(i) func(x[i], y[i]))
 contour(x, y, gx, nlevels = 7, col = "blue")
 ################################################################################
 
@@ -113,8 +105,11 @@ newton_value_4 <- newton(matrix(c(0, 2), nrow = 2, ncol = 1))
 
 ########################## [ 1 d] #############################################
 # The advantages of the steepest ascent algorithm is that it is easy to
-# calculate without need to consider about the Second derivative of the
-# function. However, the steepest ascent algorithm is not as efficient as the
+# calculate without need to consider about the second derivative of the
+# function. Newton method not guaranteed that g(x) will increase every single 
+# step.
+
+# However, the steepest ascent algorithm is not as efficient as the
 # newton method. If we implement it using newton method, with hessian matrix,
 # we can find the most steepest route to the maximum point from the start point.
 ################################################################################
