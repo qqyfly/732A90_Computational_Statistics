@@ -9,106 +9,52 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
 ```
 
 ## Question 1: Optimisation of a two-dimensional function
 
-Consider the function
-
-$$
-g(x,y)=-x^{2}-x^{2}y^{2}-2xy+2x+2
-$$
-It is desired to determine the point $(x,y), x, y \in [-3,3]$ where the function is maximized.
-
-\textbf{a. Derive the gradient and the Hessian matrix in dependence of x,y. Produce a contour plot of the
-function g.}
-
-\textbf{b. Write an own algorithm based on the Newton method in order to find a local maximum of g.}
-
-\textbf{c. Use different starting values: use the three points $(x,y) = (2,0),(-1,-2),(0,1)$  and a fourth point of your choice.}
-
-\textbf{d. What would be the advantages and disadvantages when you would run a steepest ascent algorithm instead of the Newton algorithm?}
-
-\textbf{\textcolor{blue}{Answer:}} 
+\textbf{\textcolor{blue}{Answer:}}
 
 \textbf{a}
+The gradient and the Hessian matrix is as follows:
 
-We have
-
-$g(x,y)=-x^{2}-x^{2}y^{2}-2xy+2x+2$
-
-So 
+Gradient of g is: 
 
 $$
- \begin{bmatrix} 
-  -2-2y^2 & -4xy-2 \\
-  -4xy-2 & 0
- \end{bmatrix} 
+\begin{pmatrix}
+-2x - 2xy^2 - 2y + 2 \\  -2x^2y - 2x
+\end{pmatrix}	
 $$
 
-```{R q1a ,include=FALSE}
-g <- function(x,y)
-{
-  ret <- - x^2 - x^2 * y^2 - 2 * x * y + 2 * x + 2
-  return(ret)
-}
+Hessian of g:
 
-x <- seq(-3, 3, by = 0.01)
-y <- seq(-3, 3, by = 0.01)
-
-dx <- length(x)
-dy <- length(y)
-
-gx <- matrix(rep(NA, dx*dy), nrow=dx,ncol=dy)
-
-for (i in 1:dx){
-  for (j in 1:dy)
-  {
-    gx[i,j] <- g(x[i],y[j])
-  }
-}
+$$
+\begin{pmatrix}
+-2y^2 - 2 & -4xy - 2 \\  -4xy - 2 & -2x^2
+\end{pmatrix}	
+$$
 
 \textbf{b}
 
 
+\textbf{c}
 
-contour(x,y,gx)
 
-```
+\textbf{d}
+
 
 ## Question 2: Optimisation of a two-dimensional function
 
-Three doses $(0.1, 0.3,$ and $0.9 $g$) of a drug and placebo (0 $g$) are tested in a study. A dose-dependent event is recorded afterwards. The data of $n = 10$ subjects is shown in Table 1; xi is the dose in gram; $y_{i} = 1$ if the event occurred, $y_{i} = 0$ otherwise.
+\textbf{\textcolor{blue}{Answer:}}
 
-| $x_{i}$ | in $g$ | 0 | 0 | 0 | 0.1 | 0.1 | 0.3| 0.3 | 0.9 | 0.9 | 0.9 |
-|---------|--------|---|---|---|-----|-----|----|-----|-----|-----|-----|
-|-$y_{i}$-|        | 0 | 0 | 1 |  0  |  1  |  1 |  1  |  0  |  1  |  1  |
+\textbf{a}
 
-You should fit a simple logistic regression
+\textbf{b}
 
-$$
-p(x) = P(Y=1|x)= \frac{1}{1+exp(-\beta_{0}-\beta_{1}x)}
-$$
-to the data, i.e. estimate $\beta_{0}$ and $\beta_{1}$. One can show that the log likelihood is
+\textbf{c}
 
-$$
-g(b)_ = \sum_{i=1}^{n}[y_{i}log\{(1+exp(-\beta_{0}-\beta_{1}x_{i}))^{-1}\} + (1-y_{i})log\{1-(1+exp(-\beta_{0}-\beta_{1}x_{i}))^{-1}\}]
-$$
-
-where $b=(\beta_{0},\beta_{1})^{T}$ and the gradient is
-
-$$
-g'(b) = \sum_{i=1}^{n}\{y_{i} - \frac{1}{1+exp(-\beta_{0}-\beta_{1}x_{i})}\}\begin{pmatrix}1\\x_{i}\end{pmatrix}
-$$
-\textbf{Write a function for an ML-estimator for $(\beta_{0}, \beta_{1})$ using the steepest ascent method with a step-size reducing line search (back-tracking). For this, you can use and modify the code for the steepest ascent example from the lecture. The function should count the number of function and gradient evaluations.}
-
-\textbf{b. Compute the ML-estimator with the function from a. for the data $(x_{i},y_{y})$ above. Use a stopping criterion such that you can trust five digits of both parameter estimates for $(\beta_{0}$ and $\beta_{1})$. Use the starting value $(\beta_{0}, \beta_{1}) = (-0.2,1)$. The exact way to use backtracking can be varied. Try two variants and compare number of function and gradient evaluation done until convergence.}
-
-\textbf{c. Use now the function optim with both the BFGS and the Nelder-Mead algorithm. Do you obtain the same results compared with b.? Is there any difference in the precision of the result? Compare the number of function and gradient evaluations which are given in the standard output of optim.}
-
-\textbf{d. Use the function glm in R to obtain an ML-solution and compare it with your results before.}
-
-\textbf{\textcolor{blue}{Answer:}} 
+\textbf{d}
 
 # Appendix: All code for this report
 
