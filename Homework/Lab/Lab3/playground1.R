@@ -58,9 +58,25 @@ graph
 # we have F^{-1} in ( 0,1) range is x =  1 - sqrt(1-2y)
 
 # so we can write a function to generate a random variable from it
-u <- runif(10000)
-x1 <- -1 + sqrt(1+2 * u)
-x2 <- 1 - sqrt(1-2 * u)
+# For x2, sqrt will generate some error because of the negative value
 
-hist(x1)
-hist(x2)
+u <- runif(10000)
+x1 <- -1 + sqrt(1 + u)
+x2 <- 1 - sqrt(1-u)
+
+random_var <- c(x1,x2)
+hist(random_var)
+
+# So the random variable is generated from the density function is random_var.
+########################## [ 1 c ] #############################################
+
+u1_1c <- runif(10000)
+u2_1c <- runif(10000)
+
+random_var_1c <- u1_1c - u2_1c
+hist(random_var_1c)
+
+########################## [ 1 d ] #############################################
+
+
+
