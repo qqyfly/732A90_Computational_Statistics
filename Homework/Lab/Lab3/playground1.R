@@ -79,6 +79,10 @@ hist(random_var_1c)
 ########################## [ 1 d ] #############################################
 # Since we already plot the data, we will generate the variable of 1a to 1c
 
+# since the 1c is the simplest way to generate the random variable, but since it 
+# can not adapt to some specific distribution, so we will use 1a to generate the
+# the random variable.
+
 random_var_1c_var <- var(random_var_1c)
 
 
