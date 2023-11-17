@@ -77,6 +77,10 @@ random_var_1c <- u1_1c - u2_1c
 hist(random_var_1c)
 
 ########################## [ 1 d ] #############################################
+# Since we already plot the data, we will generate the variable of 1a to 1c
+
+random_var_1c_var <- var(random_var_1c)
+
 
 
 
