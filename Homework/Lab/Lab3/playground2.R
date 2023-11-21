@@ -16,20 +16,27 @@ rm(list = ls())
 # f(x) = 1/2 * exp(x) for x < 0
 
 #$$
-# F(x) =
+# F(x) = - \frac{1}{2}exp(-x) if x >= 0
+# F(x) = \frac{1}{2}exp(x) if x < 0
 #$$
 
 # Calculate the inverse function of CDF
 #$$
-#
+# F^{-1}(y) = log(2y)
+# F^{-1}(y) = -log(-2y)
 #$$
 
-n <- 1000
+generate_random_var_2a <- function(n){
+  u <- runif(n)
+  x1 <-  log(2 * u)
+  x2 <-  - log(-2 * u)
+  return(c(x1, x2))
+}
 
-# plot histogram of those random variable
+random_var_2a <- generate_random_var_2a(10000)
+hist(random_var_2a)
 
-# according to the histogram, we can see that the random variable is XXXX
+# Comment on the result
 
 ########################## [ 2 b ] #############################################
 
-n <- 2000

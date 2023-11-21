@@ -179,9 +179,60 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list = ls())
 ```
 #### (a) 
+
+We have the function
+
+$$
+DE(\mu,\lambda) = \frac{\lambda}{2} exp(-\lambda|x-\mu|)
+$$
+
+Calculate the integral of the function on x to get CDF
+since $\mu = 0$ and $\lambda = 1$, we have $\frac{1}{2} exp(-1|x|)$.
+Also because we have a absolute value, we need to split the integral into two parts.
+
+$$
+f(x) = 
+\begin{cases}
+  \frac{1}{2} * exp(-x)\\
+  \frac{1}{2} * exp(x)
+\end{cases}
+$$
+
+We calculate the CDF
+
+$$
+CDF = 
+\begin{cases}
+- \frac{1}{2}exp(-x)  \\
+  \frac{1}{2}exp(x)  
+\end{cases}
+$$
+
+Then we calculate the inverse function of CDF
+$$
+F^{-1}(y) = 
+\begin{cases}
+log(2y) \\
+-log(-2y)
+\end{cases}
+$$
+
+According to the plot, we know that XXXX
+
 ```{r 2.a}
 ########################## [ 2 a ] ######################################
+
+generate_random_var_2a <- function(n){
+  u <- runif(n)
+  x1 <-  log(2 * u)
+  x2 <-  - log(-2 * u)
+  return(c(x1, x2))
+}
+
+random_var_2a <- generate_random_var_2a(10000)
+hist(random_var_2a)
 ```
+
 
 #### (b) 
 ```{r 2.b}
