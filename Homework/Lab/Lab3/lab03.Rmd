@@ -1,5 +1,5 @@
 ---
-title: "Computational Statistics Computer Lab 2 (Group 7)"
+title: "Computational Statistics Computer Lab 3 (Group 7)"
 author: 
   - Qinyuan Qi(qinqi464)
   - Satya Sai Naga Jaya Koushik	Pilla (satpi345)
