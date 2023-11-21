@@ -18,7 +18,7 @@ rm(list = ls())
 
 ### (A)
 Since we need to find a envelope function for the density function, so we need
-to plot the density function first. let $ x \in [-3, 3] $, and we know it's  
+to plot the density function first. let $x \in [-3, 3]$, and we know it's  
 triangle sharped function. We also can plot it using the code(Check appendix).
 the target function $g(x) = 1$ in $[-1,1]$, otherwise $g(x) = 0$
 
@@ -108,23 +108,28 @@ To generate a random variable from the density function using Inverse CDF,
 we will need to calculate the CDF function first.
 
 CDF function as follows:
-$$
 
-CDF = \left\{ \begin{array}
-0 & \mbox{for} & x \in (-\inf,-1) \\
-\frac{x^2}{2} + x & \mbox{for} & x \in (-1,0) \\
-x - \frac{x^2}{2} & \mbox{for} & x \in (0,1) \\
-1 & \mbox{for} & x \in (1,\inf) 
- \end{array}\right
 $$
-
+CDF = 
+\begin{cases}
+    0 ,& \text{if }  x \in (-\infty,-1) \\
+    \frac{x^2}{2} + x,& \text{if }  x \in (-1,0) \\
+    x - \frac{x^2}{2},& \text{if }  x \in (0,1) \\
+    1,& \text{if } x \in (1,\infty) 
+\end{cases}
+$$
 Since -Y has a triangle  distribution on $[-1,0]$, so we have 
 
-$F^{-1}$ in range $[-1,0)$ is $x = -1 + \sqrt{1-2y}$,
+$$
+F^{-1} = 
+\begin{cases}
+    x = -1 + \sqrt{1-2y},& \text{if }  x \in [-1,0) \\
+    x =  1 - \sqrt{1-2y},& \text{if }  x \in[0,1] \\
+    0, Otherwise 
+\end{cases}
+$$
 
-Also we have $F^{-1}$ in $[0,1]$ range is $x =  1 - \sqrt{1-2y}$
-
-The following is the function to generate a random variable from it
+The following is the function to generate a random variable from it.
 
 ```{r 1b}
 ########################## [ 1 b ] #############################################
