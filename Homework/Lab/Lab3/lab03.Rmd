@@ -12,7 +12,7 @@ output: pdf_document
 ### Answer:
 
 ```{r setup1, include=FALSE}
-########################## INIT CODE ###########################################
+########################## Init code for question 1 ############################
 rm(list = ls())
 ```
 
@@ -174,7 +174,7 @@ CDF and inverse function, in some cases, it's hard to do that, so we will use
 ### Answer:
 
 ```{r setup2, include=FALSE}
-################### Init code for Question 1 ###################################
+########################## Init code for question 2#############################
 knitr::opts_chunk$set(echo = TRUE)
 rm(list = ls())
 ```
