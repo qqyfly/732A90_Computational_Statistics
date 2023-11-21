@@ -54,22 +54,23 @@ graph
 # in range (0,1)  we get CDF = x - \frac{x^2}{2}
 # in range (1,+inf)  we get CDF = 1
 
-# we have F^{-1} in (-1,0) range is x = -1 + sqrt(1+2y)
+# we have F^{-1} in (-1,0) range is x = -1 + sqrt(1-2y)
 # we have F^{-1} in ( 0,1) range is x =  1 - sqrt(1-2y)
 
 # so we can write a function to generate a random variable from it
 # For x2, sqrt will generate some error because of the negative value
 
-u <- runif(10000)
-x1 <- -1 + sqrt(1 + 2 * u)
-x2 <- 1 - sqrt(1 - 2 * u)
+u <- runif(1000)
 
-random_var <- c(x1, x2)
+x1 <-  sqrt(1 - 2 * u)  - 1
+
+x2 <-  1 - sqrt(1 - 2 * u)
+
+random_var <- c(x1,x2)
 hist(random_var)
 
 # So the random variable is generated from the density function is random_var.
 ########################## [ 1 c ] #############################################
-
 u1_1c <- runif(10000)
 u2_1c <- runif(10000)
 
