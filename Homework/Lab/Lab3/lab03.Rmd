@@ -237,6 +237,11 @@ hist(random_var_2a)
 #### (b) 
 ```{r 2.b}
 ########################## [ 2 b ] #############################################
+
+
+# Generate 2000 random variables from the distribution using rnorm
+random_var_2b2 <- rnorm(2000, 0, 1)
+hist(random_var_2b2)
 ```
 
 \newpage
