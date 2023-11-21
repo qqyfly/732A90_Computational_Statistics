@@ -61,10 +61,10 @@ graph
 # For x2, sqrt will generate some error because of the negative value
 
 u <- runif(10000)
-x1 <- -1 + sqrt(1 + u)
-x2 <- 1 - sqrt(1-u)
+x1 <- -1 + sqrt(1 + 2 * u)
+x2 <- 1 - sqrt(1 - 2 * u)
 
-random_var <- c(x1,x2)
+random_var <- c(x1, x2)
 hist(random_var)
 
 # So the random variable is generated from the density function is random_var.

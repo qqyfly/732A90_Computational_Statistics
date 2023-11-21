@@ -1,0 +1,182 @@
+---
+title: "Computational Statistics Computer Lab 2 (Group 7)"
+author: 
+  - Qinyuan Qi(qinqi464)
+  - Satya Sai Naga Jaya Koushik	Pilla (satpi345)
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+## Question 1:  Sampling algorithms for a triangle distribution (Solved by Qinqi Qi)
+
+### Answer:
+
+```{r setup1, include=FALSE}
+################### Init code for Question 1 ###################################
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+```
+
+#### (a) 
+
+Since we need to find a envelope function for the density function, so we need to plot the density function first. let $$ x \in [-3, 3] $$ 
+We know it's  triangle sharped function. We also can plot it using the code below.
+
+```{r 1.a}
+########################## [ 1 a ] #############################################
+x <- seq(-2, 2, by = 0.001)
+y <- rep(0, length(x))
+z <- rep(0, length(x))
+
+x1_index <- which(x > 1 | x < -1)
+x2_index <- which(x >= -1 & x <= 0)
+x3_index <- which(x > 0 & x <= 1)
+
+y[x1_index] <- 0
+y[x2_index] <- x[x2_index] + 1
+y[x3_index] <- 1 - x[x3_index]
+
+z0_index <- which(x > 1 | x < -1)
+z1_index <- which(x >= -1 & x <= 1)
+
+z[z1_index] <- 1
+z[-z1_index] <- 0
+
+data <- data.frame(x, y, z)
+
+# After we get the plot, we can see that the density function is a triangle
+# we will use an envelope function to cover the density function, and we can
+# use function $ g(x) = 1 $ to cover the density function in the [-1,1] range. 
+
+graph <- ggplot2::ggplot(data) +
+  ggplot2::geom_line(mapping=ggplot2::aes(x=x,y=y)) + 
+  ggplot2::geom_line(mapping=ggplot2::aes(x=x,y=z),color="blue") + 
+  ggplot2::ggtitle("Density function of X and envelope function") +
+  ggplot2::xlab("x") +
+  ggplot2::ylab("y,z")
+
+
+graph
+
+```
+
+Now we will write a code for the rejection sampling algorithm. 
+
+#### (b) 
+
+To generate a random variable from the density function using Inverse CDF, we will need to calculate the CDF function first.
+
+CDF function
+in range (-inf,-1) we get $$CDF = 0$$
+in range (-1,0) we get $$CDF = \frac{x^2}{2} + x$$
+in range (0,1)  we get $$CDF = x - \frac{x^2}{2}$$
+in range (1,+inf)  we get $$CDF = 1$$
+
+we have $$F^{-1}$$ in (-1,0) range is $$x = -1 + \sqrt{1+2y}$$
+we have $$F^{-1}$$ in (0,1) range is $$x =  1 - \sqrt{1-2y}$$
+
+so we can write a function to generate a random variable from it
+For x2, sqrt will generate some error because of the negative value
+
+So the random variable is generated from the density function is random_var.
+
+```{r 1.b}
+######################### [ 1 b ] #############################################
+
+u <- runif(100000)
+# TODO:maybe here we need to check the status of it
+x1 <- -1 + sqrt(1 - 2 * u)
+
+x2 <- 1 -  sqrt(1 - 2 * u)
+
+random_var <- c(x1,x2)
+hist(random_var)
+
+```
+
+#### (c) 
+```{r 1.c}
+######################### [ 1 c ] #############################################
+
+u1_1c <- runif(10000)
+u2_1c <- runif(10000)
+
+random_var_1c <- u1_1c - u2_1c
+hist(random_var_1c)
+```
+
+
+#### (d) 
+
+Since we already plot the data, we will generate the variable of 1a to 1c
+
+since the 1c is the simplest way to generate the random variable, but since it 
+can not adapt to some specific distribution, so we will use 1a to generate the
+the random variable.
+
+
+```{r 1.d}
+########################## [ 1 d ] #############################################
+
+random_var_1c_var <- var(random_var_1c)
+
+```
+
+
+## Question 2:  Laplace distribution (Solved by Satya Sai Naga Jaya Koushik	Pilla)
+
+### Answer:
+
+```{r setup2, include=FALSE}
+################### Init code for Question 1 ###################################
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+```
+#### (a) 
+```{r 2.a}
+
+########################## [ 2 a ] #############################################
+# We have the function
+
+#$$
+# DE(\mu,\lambda) = \frac{\lambda}{2} exp(-\lambda|x-\mu|)
+#$$
+
+# Calculate the integral of the function on x to get CDF
+# since \mu = 0 and \lambda = 1, we have
+# \frac{1}{2} exp(-1|x|)
+# since we have a absolute value, we need to split the integral into two parts
+# f(x) = 1/2 * exp(-x) for x >= 0
+# f(x) = 1/2 * exp(x) for x < 0
+
+#$$
+# F(x) =
+#$$
+
+# Calculate the inverse function of CDF
+#$$
+#
+#$$
+
+n <- 1000
+
+# plot histogram of those random variable
+
+# according to the histogram, we can see that the random variable is XXXX
+
+```
+
+#### (b) 
+```{r 2.b}
+
+########################## [ 2 b ] #############################################
+
+n <- 2000
+```
+
+\newpage
+# Appendix: Code for this report
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
+
