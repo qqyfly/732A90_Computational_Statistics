@@ -254,8 +254,6 @@ generate_random_var_2a <- function(n){
 random_var_2a <- generate_random_var_2a(10000)
 hist(random_var_2a)
 ```
-For the first plot random_var_2b1, the data is mostly located in [-2,2] area.
-For the second plot random_var_2b2, the data is mostly located in [-3,3] area.
 
 #### (b) 
 
@@ -280,6 +278,10 @@ $$
 
 we will use $a = 0.5$ here.
 According to the execute result , we know that the average rejection rate is 0.4430274.
+
+For the first plot random_var_2b1, the data is mostly located in [-2,2] area.
+For the second plot random_var_2b2, the data is mostly located in [-3,3] area.
+
 
 ```{r 2.b}
 ########################## [ 2 b ] #############################################
