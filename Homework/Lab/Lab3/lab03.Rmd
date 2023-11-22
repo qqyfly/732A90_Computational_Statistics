@@ -254,6 +254,8 @@ generate_random_var_2a <- function(n){
 random_var_2a <- generate_random_var_2a(10000)
 hist(random_var_2a)
 ```
+For the first plot random_var_2b1, the data is mostly located in [-2,2] area.
+For the second plot random_var_2b2, the data is mostly located in [-3,3] area.
 
 #### (b) 
 

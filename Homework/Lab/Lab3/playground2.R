@@ -28,13 +28,15 @@ rm(list = ls())
 
 generate_random_var_2a <- function(n){
   u1 <- runif(n,0,1)
+  
   x1 <-  log(2 * u1)
   u2 <- runif(n,-1,0)
+  
   x2 <-  - log(-2  * u2)
   return(c(x1, x2))
 }
 
-random_var_2a <- generate_random_var_2a(10000)
+random_var_2a <- generate_random_var_2a(2000)
 hist(random_var_2a)
 
 
