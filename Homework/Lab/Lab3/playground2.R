@@ -27,16 +27,17 @@ rm(list = ls())
 #$$
 
 generate_random_var_2a <- function(n){
-  u <- runif(n)
-  x1 <-  log(2 * u)
-  x2 <-  - log(-2 * u)
+  u1 <- runif(n,0,1)
+  x1 <-  log(2 * u1)
+  u2 <- runif(n,-1,0)
+  x2 <-  - log(-2  * u2)
   return(c(x1, x2))
 }
 
 random_var_2a <- generate_random_var_2a(10000)
 hist(random_var_2a)
 
-# Comment on the result
+
 
 ########################## [ 2 b ] #############################################
 
@@ -60,7 +61,7 @@ generate_random_var_2b <- function(n, a) {
   samples <- numeric(n)
   # Generate a sample from the proposal distribution in [-1,1]
   count <- 1
-
+  execute_count <- 1
 
   while (count <= n) {
 
@@ -88,7 +89,9 @@ generate_random_var_2b <- function(n, a) {
         count <- count + 1
       }
     }
+    execute_count <- execute_count + 1
   }
+  cat("Average rejection rate: ", (execute_count - count) / execute_count, "\n")
   return(samples)
 }
 

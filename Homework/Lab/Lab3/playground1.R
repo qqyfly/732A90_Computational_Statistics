@@ -6,6 +6,7 @@ rm(list = ls())
 # to plot the density function first. let $ x \in [-3, 3] $, and we know it's  
 # triangle sharped function. We also can plot it using the code below.
 # the target function g(x) = 1 in the range [-1,1], otherwise g(x) = 0
+# since we set a = 0.5, so e(x) = g / a = 2
 
 x <- seq(-2, 2, by = 0.001)
 y <- rep(0, length(x))
@@ -22,7 +23,7 @@ y[x3_index] <- 1 - x[x3_index]
 z0_index <- which(x > 1 | x < -1)
 z1_index <- which(x >= -1 & x <= 1)
 
-z[z1_index] <- 1
+z[z1_index] <- 2
 z[-z1_index] <- 0
 
 data <- data.frame(x, y, z)
@@ -82,6 +83,8 @@ generate_random_var_1a <- function(n, a) {
 a <- 0.5
 random_var_1a <- generate_random_var_1a(10000, a)
 hist(random_var_1a)
+var_of_random_var_1a <- var(random_var_1a)
+cat("variance of 1st method is",var_of_random_var_1a)
 ########################## [ 1 b ] #############################################
 # To generate a random variable from the density function using Inverse CDF,
 # we will need to calculate the CDF function first.
@@ -107,6 +110,8 @@ generate_random_var_1b <- function(n){
 
 random_var_1b <- generate_random_var_1b(10000)
 hist(random_var_1b)
+var_of_random_var_1b <- var(random_var_1b)
+cat("variance of 2nd method is",var_of_random_var_1b)
 ########################## [ 1 c ] #############################################
 generate_random_var_1c <- function(n){
   u1_1c <- runif(n)
@@ -116,7 +121,8 @@ generate_random_var_1c <- function(n){
 
 random_var_1c <- generate_random_var_1c(10000)
 hist(random_var_1c)
-
+var_of_random_var_1c <- var(random_var_1c)
+cat("variance of 3rd method is",var_of_random_var_1c)
 ########################## [ 1 d ] #############################################
 # Since we already plot the data, we will generate the variable of 1a to 1c
 
