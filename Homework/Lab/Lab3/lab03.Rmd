@@ -245,10 +245,9 @@ According to the plot, we know that most of the data are located in [-3,3] area.
 ########################## [ 2 a ] ######################################
 
 generate_random_var_2a <- function(n){
-  u1 <- runif(n,0,1)
-  x1 <-  log(2 * u1)
-  u2 <- runif(n,-1,0)
-  x2 <-  - log(-2  * u2)
+  u <- runif(n,0,1)
+  x1 <-  log(2 * u)
+  x2 <-  - log(- 2  * (- 1) * u)
   return(c(x1, x2))
 }
 
@@ -297,7 +296,7 @@ generate_random_var_2b <- function(n, a) {
 
   while (count <= n) {
 
-    x <- runif(1, -1, 1)
+    x <- runif(1, -5, 5)
     # Calculate the acceptance probability
     u <- runif(1)
 
@@ -308,7 +307,7 @@ generate_random_var_2b <- function(n, a) {
     # Calculate the acceptance probability
     f_val <- normal_distribution_function(x)
 
-    if (x > 0){
+    if (x < 0){
       e <- exp(-x)
       if (u <= (f_val / e)) {
         samples[count] <- x
@@ -327,7 +326,7 @@ generate_random_var_2b <- function(n, a) {
   return(samples)
 }
 
-a <- 0.5
+a <- 0.2
 random_var_2b1 <- generate_random_var_2b(10000, a)
 hist(random_var_2b1)
 
