@@ -52,7 +52,7 @@ plot_1a <- ggplot2::ggplot() +
   ggplot2::xlab("x") +
   ggplot2::ylab("y")
 
-# comment on the plot
+# TODO: comment on the plot
 
 # TODO: check burn–in period meaning
 
