@@ -38,6 +38,7 @@ lines(xv, -(w/2)*xv+sqrt(1-(1-w^2/4)*xv^2), lwd=2, col=8)
 
 ########################## 2c ##################################################
 # DONE
+# TODO: Need add comment.
 
 gibbs_sampling_2c <- function(n, x0) {
     samples <- matrix(nrow = n, ncol = 2)
@@ -84,10 +85,10 @@ points(gibbs_sampling_result_2c[,1], gibbs_sampling_result[,2], col=2, pch=20, c
 # As we can see from the 2 plots, the ellipse for w = 1.999 is more flat than 
 # the ellipse for w = 1.8.
 
-# TODO: Add more discussion
+# Add more discussion
 
 ########################## 2e ##################################################
-# TODO: NEED TO Calc the boundary of the ellipse
+# TODO: NEED TO Calc the boundary of the ellipse and add comment.
 # Function is DONE and tested.
 
 # We need to transform the variable X and convert to U = (U1, U2) = (X_{1} - X{2}, X{1} + X{2})
