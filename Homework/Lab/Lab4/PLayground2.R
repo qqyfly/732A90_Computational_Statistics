@@ -37,6 +37,7 @@ lines(xv, -(w/2)*xv+sqrt(1-(1-w^2/4)*xv^2), lwd=2, col=8)
 
 
 ########################## 2c ##################################################
+# DONE
 
 gibbs_sampling_2c <- function(n, x0) {
     samples <- matrix(nrow = n, ncol = 2)
@@ -70,11 +71,13 @@ n <- 1000
 gibbs_sampling_result_2c <- gibbs_sampling_2c(n, x0)
 
 # plot the sample point on the eclipse
-points(gibbs_sampling_result[,1], gibbs_sampling_result[,2], col=2, pch=20, cex=0.5)
+points(gibbs_sampling_result_2c[,1], gibbs_sampling_result[,2], col=2, pch=20, cex=0.5)
 
 # comment on the result ( about the true result)
 
 ########################## 2d ##################################################
+# Almost DONE
+
 # Discuss, why the Gibbs sampling for this situation seems to be less successful
 # for w = 1.999 compared to the case w = 1.8 from the lecture.
 
@@ -84,6 +87,8 @@ points(gibbs_sampling_result[,1], gibbs_sampling_result[,2], col=2, pch=20, cex=
 # TODO: Add more discussion
 
 ########################## 2e ##################################################
+# TODO: NEED TO Calc the boundary of the ellipse
+# Function is DONE and tested.
 
 # We need to transform the variable X and convert to U = (U1, U2) = (X_{1} - X{2}, X{1} + X{2})
 # And since U is still a uniform distribution, we can use the same method as in 2c
@@ -144,11 +149,7 @@ gibbs_sampling_2e <- function(n, u0) {
 
         samples[count,] <- c(u1_new, u2_new)
 
-        # Calculate p(x1 > 0) = p((u1 + u2) / 2 > 0)
-        #prob_value <- sum((samples[1:count, 1] + samples[1:count, 2])/2 > 0) /
-        #      length(samples[1:count, 1])
 
-        #cat("The probability that x1 > 0 is", prob_value, "\n")
         u1 <- u1_new
         u2 <- u2_new
 
@@ -161,5 +162,14 @@ gibbs_sampling_2e <- function(n, u0) {
 u0 <- c(0, 0)
 n <- 1000
 gibbs_sampling_result_2e <- gibbs_sampling_2e(n, u0)
+
+# Calculate p(x1 > 0) = p((u1 + u2) / 2 > 0)
+prob_value <- sum((gibbs_sampling_result_2e[1:count, 1] + gibbs_sampling_result_2e[1:count, 2])/2 > 0) /
+              length(gibbs_sampling_result_2e[1:count, 1])
+
+cat("The probability that x1 > 0 is", prob_value, "\n")
+
+# plot the sample point on the eclipse
+points(gibbs_sampling_result_2e[,1], gibbs_sampling_result_2e[,2], col=2, pch=20, cex=0.5)
 
 # TODO: compare the result with the result from 2c
