@@ -17,7 +17,6 @@ lines(xv, -(w/2)*xv+sqrt(1-(1-w^2/4)*xv^2), lwd=2, col=8)
 
 ########################## 2b ##################################################
 # DONE
-
 # Since w = 1.999, and  x_{1}^2 + 1.999*x_{1}*x_{2} + x_{2}^2 < 1
 # Using the quadratic formula, we apply this on
 # x_{1}^2 + 1.999*x_{1}*x_{2} + x_{2}^2 - 1 = 0
@@ -33,7 +32,6 @@ lines(xv, -(w/2)*xv+sqrt(1-(1-w^2/4)*xv^2), lwd=2, col=8)
 
 ########################## 2c ##################################################
 # DONE
-# TODO: Need add comment.
 
 gibbs_sampling_2c <- function(n, x0) {
     samples <- matrix(nrow = n, ncol = 2)
@@ -67,42 +65,43 @@ n <- 1000
 gibbs_sampling_result_2c <- gibbs_sampling_2c(n, x0)
 
 # plot the sample point on the eclipse
-points(gibbs_sampling_result_2c[,1], gibbs_sampling_result[,2], col=2, pch=20, cex=0.5)
+points(gibbs_sampling_result_2c[,1], gibbs_sampling_result_2c[,2], col=2, pch=20, cex=0.5)
 
 # comment on the result ( about the true result)
 
 ########################## 2d ##################################################
-# Almost DONE, add comment
-
-# Discuss, why the Gibbs sampling for this situation seems to be less successful
-# for w = 1.999 compared to the case w = 1.8 from the lecture.
-
 # As we can see from the 2 plots, the ellipse for w = 1.999 is more flat than 
 # the ellipse for w = 1.8.
 
-# Add more discussion
-
 ########################## 2e ##################################################
-# TODO: NEED TO Calc the boundary of the ellipse and add comment.
-# Function is DONE and tested.
-
-# We need to transform the variable X and convert to U = (U1, U2) = (X_{1} - X{2}, X{1} + X{2})
+# We need to transform the variable X and convert to 
+# U = (U1, U2) = (X_{1} - X{2}, X{1} + X{2})
 # And since U is still a uniform distribution, we can use the same method as in 2c
 
 # We have 
-# U1 = X_{1} - X{2}
-# U2 = X_{1} + X{2}
+# U1 = X_{2} - X_{2}
+# U2 = X_{1} + X_{2}
 # so we have
 # X_{1} = (U1 + U2) / 2
 # X_{2} = (U2 - U1) / 2
 
-# We replace this into the original function, we have
-# {\frac{U1+U2}{2}}^2 + 1.999 * \frac{(U2+U1)(U2-U1)}{4} + {\frac{U2 - U1}{2}}^2 < 1
+# We replace this into the original function, and after some simplification, we have
+# (2+w) * u_{2}^2 + (2 - w) * u_{1}^2 - 4 = 0
 
-# and after do some simplification, we have
-# 0.001 * U_{1}^{2} + 3.999 * U_{1} * U_{2} -4 = 0
+# calculate the boundary of the ellipse, we have 
+# (-sqrt((4 -  (2-w) * u_{1}^2) / (2 + w)), sqrt((4 -  (2-w) * u_{1}^2) / (2 + w)))
+# another one is
+# (-sqrt((4 -  (2+w) * u_{2}^2) / (2 - w)), sqrt((4 -  (2+w) * u_{2}^2) / (2 - w)))
 
-# we have
+# The boundary of the ellipse is:
+w  <- 1.999
+xv <- seq(-1, 1, by=0.01) * 1/sqrt(1-w^2/4)
+
+#plot(xv, xv, type="n", xlab=expression(x[1]), ylab=expression(x[2]), las=1)
+
+
+# substitute w = 1.999, we have
+
 # The conditional distribution for u_{2} given u_{1} is a uniform distribution
 # on the interval
 # (-\sqrt{\frac{4-0.001 * u_{1}^2}{3.999}}, \sqrt{\frac{4-0.001 * u_{1}^2}{3.999}})
@@ -111,12 +110,6 @@ points(gibbs_sampling_result_2c[,1], gibbs_sampling_result[,2], col=2, pch=20, c
 # (-\sqrt{\frac{4-3.999 * u_{2}^2}{0.001}}, \sqrt{\frac{4-3.999 * u_{2}^2}{0.001}})
 
 
-# TODO:
-# The boundary of the ellipse is ?????
-#w  <- 1.999
-#xv <- seq(-1, 1, by=0.01) * 1/sqrt(1-w^2/4)
-
-#plot(xv, xv, type="n", xlab=expression(x[1]), ylab=expression(x[2]), las=1)
 
 # ellipse
 #(-1 * sqrt{(4-0.001 * u1^2}{3.999}}, \sqrt{\frac{4-0.001 * u_{1}^2}{3.999}})
