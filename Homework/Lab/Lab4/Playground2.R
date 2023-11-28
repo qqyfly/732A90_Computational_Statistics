@@ -153,8 +153,8 @@ n <- 1000
 gibbs_sampling_result_2e <- gibbs_sampling_2e(n, u0)
 
 # Calculate p(x1 > 0) = p((u1 + u2) / 2 > 0)
-prob_value <- sum((gibbs_sampling_result_2e[1:count, 1] + gibbs_sampling_result_2e[1:count, 2])/2 > 0) /
-              length(gibbs_sampling_result_2e[1:count, 1])
+prob_value <- sum((gibbs_sampling_result_2e[1:n, 1] + gibbs_sampling_result_2e[1:n, 2])/2 > 0) /
+              length(gibbs_sampling_result_2e[1:n, 1])
 
 cat("The probability that x1 > 0 is", prob_value, "\n")
 
