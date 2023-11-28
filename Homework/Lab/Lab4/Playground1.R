@@ -1,121 +1,169 @@
 ########################## INIT CODE ###########################################
 rm(list = ls())
+library(ggplot2)
 
 ########################## 1a ##################################################
+# DONE
 
 fx_1a <- function(x) {
-
   return(ifelse(x <= 0, 0, x^5 * exp(-x)))
 }
 
-metropolis_hastings_log_normal <- function(n) {
-  
+metropolis_hastings_log_normal_1a <- function(n) {
   samples <- rep(0, n)
 
-  # sample from a proposal distribution g
-  # here we use log-normal distribution
+  # sample from a log-normal distribution
   xt <- rlnorm(1, 0, 1)
-  rlnorm(1, logxt, 1)
   samples[1] <- xt
 
-  
+  # set some initial values
+  count <- 1
+  accepted_count <- 0
 
   while (count <= n) {
-    # sample a candidate from a proposal distribution g
-    x_star <- rlnorm(1, 0, 1)
-    
-    execute_count <- execute_count + 1
+    # sample a candidate from log normal distribution
+    x_star <- rlnorm(1, log(xt), 1)
 
-    # TODO: check it 
-    mh_ratio <- f(x_star) / f(xt)
+    # calc a ratio
+    mh_ratio <- (fx_1a(x_star) * dlnorm(xt, log(x_star))) /
+                (fx_1a(xt) * dlnorm(x_star, log(xt)))
 
-    xt_plus <- xt
 
+    # accept according to the ratio
     if (mh_ratio > 1) {
+      xt_plus <- x_star
+      accepted_count <- accepted_count + 1
+    } else {
+      u <- runif(1)
+      if (u < mh_ratio) {
         xt_plus <- x_star
-        accept_count <- accept_count + 1
+        accepted_count <- accepted_count + 1
+      } else {
+        xt_plus <- xt
+      }
     }
 
     samples[count] <- xt_plus
     count <- count + 1
-    x_t <- xt_plus
+    xt <- xt_plus
   }
-  
-  
-  return(list(random_variable=samples, acceptance_rate= n / execute_count )
+  return(list(random_variable = samples, acceptance_rate = accepted_count / n))
 }
 
+sample_number <- 10000
+result_1a <- metropolis_hastings_log_normal_1a(sample_number)
 
-sample_number <- 1
-result_1a <- metropolis_hastings_log_normal(sample_number)
+data_set_1a <- data.frame(x = 1:sample_number, y = result_1a$random_variable)
+
 result_1a_sample <- result_1a$random_variable
+
+ggplot(data = data_set_1a, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  ggtitle("x vs y") +
+  xlab("x") +
+  ylab("y")
+
+# according to the result, the convergence of the chain seems not converge to 
+# a fixed value.
+
+# According to the graph, there does not have a significant burn-in period.From
+# the beginning, the chain seems very stable.
+
+# The acceptance rate is 0.448 
 result_1a_acceptance_rate <- result_1a$acceptance_rate
-
-
-
-data <- data.frame(x=1:sample_number,y=result_1a)
-plot_1a <- ggplot2::ggplot() +
-  ggplot2::geom_line(mapping=ggplot2::aes(x=x,y=y)) + 
-  ggplot2::ggtitle("x vs y") +
-  ggplot2::xlab("x") +
-  ggplot2::ylab("y")
-
-# TODO: comment on the plot
-
-# TODO: check burn–in period meaning
-
-# get the acceptance rate
-cat("acceptance rate is", result_1a_acceptance_rate)
+cat("acceptance rate is", result_1a_acceptance_rate, "\n")
 
 # plot a histogram of the 1a samples
 hist(result_1a_sample)
 
-# Question 1b
+########################## 1b ##################################################
 # we use chi-square distribution X^2(|x+1|) as the proposal distribution
 
-
-metropolis_hastings_chi_square <- function(n) {
-  
-  samples <- numeric(n)
-
-  count <- 1
-  execute_count <- 0
-
-  # sample from a proposal distribution g
-  # here we use log-normal distribution
-  # TODO: find how to define df, since we don't know the Xt now,and in the prev 
-  # sample we use rlnorm(1, 0, 1) to generate xt directly
-
   xt <- rchisq(n=1,df = 1)
+metropolis_hastings_chi_square <- function(n) {
+  samples <- rep(0, n)
 
-  while(count <= n) {
-    # sample a candidate from a proposal distribution g
-    # TODO: reason as above
+  # sample from a log-normal distribution
+  xt <- rlnorm(1, 0, 1)
+  samples[1] <- xt
 
-    x_star <- rchisq(n=1,df = 1)
-    
-    execute_count <- execute_count + 1
+  # set some initial values
+  count <- 1
+  accepted_count <- 0
 
-    # TODO: check it 
-    mh_ratio <- f(x_star) / f(xt)
+  while (count <= n) {
+    # sample a candidate from log normal distribution
+    x_star <- rlnorm(1, log(xt), 1)
 
-    xt_plus <- xt
+    # calc a ratio
+    mh_ratio <- (fx_1a(x_star) * dlnorm(xt, log(x_star))) /
+                (fx_1a(xt) * dlnorm(x_star, log(xt)))
 
+
+    # accept according to the ratio
     if (mh_ratio > 1) {
+      xt_plus <- x_star
+      accepted_count <- accepted_count + 1
+    } else {
+      u <- runif(1)
+      if (u < mh_ratio) {
         xt_plus <- x_star
-        accept_count <- accept_count + 1
+        accepted_count <- accepted_count + 1
+      } else {
+        xt_plus <- xt
+      }
     }
 
     samples[count] <- xt_plus
     count <- count + 1
-    x_t <- xt_plus
-  }  
-  return(list(random_variable=samples, acceptance_rate= n / execute_count )
+    xt <- xt_plus
+  }
+  return(list(random_variable = samples, acceptance_rate = accepted_count / n))
 }
 
-# Question 1c
-# same as 1b , we will use another proposal distribution like what we see on 1b
-# TODO: add code here
+########################## 1c ##################################################
+# we use LN(X_{t},2) as the proposal distribution
+metropolis_hastings_log_normal_1c <- function(n) {
+  samples <- rep(0, n)
+
+  # sample from a log-normal distribution
+  xt <- rlnorm(1, 0, 1)
+  samples[1] <- xt
+
+  # set some initial values
+  count <- 1
+  accepted_count <- 0
+
+  while (count <= n) {
+    # sample a candidate from log normal distribution
+    x_star <- rlnorm(1, log(xt), 1)
+
+    # calc a ratio
+    mh_ratio <- (fx_1a(x_star) * dlnorm(xt, log(x_star))) /
+                (fx_1a(xt) * dlnorm(x_star, log(xt)))
+
+
+    # accept according to the ratio
+    if (mh_ratio > 1) {
+      xt_plus <- x_star
+      accepted_count <- accepted_count + 1
+    } else {
+      u <- runif(1)
+      if (u < mh_ratio) {
+        xt_plus <- x_star
+        accepted_count <- accepted_count + 1
+      } else {
+        xt_plus <- xt
+      }
+    }
+
+    samples[count] <- xt_plus
+    count <- count + 1
+    xt <- xt_plus
+  }
+  return(list(random_variable = samples, acceptance_rate = accepted_count / n))
+}
+
 
 # Question 1d
 # TODO: comment on the plot of 1a,1b,1c and draw a conclusion
