@@ -1,20 +1,26 @@
-# Question 1a
+########################## INIT CODE ###########################################
+rm(list = ls())
+
+########################## 1a ##################################################
 
 fx_1a <- function(x) {
-  return(x^5 * exp(-x))
+
+  return(ifelse(x <= 0, 0, x^5 * exp(-x)))
 }
 
 metropolis_hastings_log_normal <- function(n) {
   
-  samples <- numeric(n)
+  samples <- rep(0, n)
 
-  count <- 1
-  execute_count <- 0
   # sample from a proposal distribution g
   # here we use log-normal distribution
   xt <- rlnorm(1, 0, 1)
+  rlnorm(1, logxt, 1)
+  samples[1] <- xt
 
-  while(count <= n) {
+  
+
+  while (count <= n) {
     # sample a candidate from a proposal distribution g
     x_star <- rlnorm(1, 0, 1)
     

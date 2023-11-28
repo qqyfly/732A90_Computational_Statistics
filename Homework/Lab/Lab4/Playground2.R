@@ -1,14 +1,12 @@
 ########################## INIT CODE ###########################################
 rm(list = ls())
 
-
 ########################## 2a ##################################################
 # DONE
 
 w  <- 1.999
 
 # Draw the boundary of the ellipse
-
 # a range of x1-values, where the term below the root is non-negative 
 xv <- seq(-1, 1, by=0.01) * 1/sqrt(1-w^2/4)
 plot(xv, xv, type="n", xlab=expression(x[1]), ylab=expression(x[2]), las=1)
@@ -16,9 +14,6 @@ plot(xv, xv, type="n", xlab=expression(x[1]), ylab=expression(x[2]), las=1)
 # ellipse
 lines(xv, -(w/2)*xv-sqrt(1-(1-w^2/4)*xv^2), lwd=2, col=8)
 lines(xv, -(w/2)*xv+sqrt(1-(1-w^2/4)*xv^2), lwd=2, col=8)
-
-
-
 
 ########################## 2b ##################################################
 # DONE
@@ -77,7 +72,7 @@ points(gibbs_sampling_result_2c[,1], gibbs_sampling_result[,2], col=2, pch=20, c
 # comment on the result ( about the true result)
 
 ########################## 2d ##################################################
-# Almost DONE
+# Almost DONE, add comment
 
 # Discuss, why the Gibbs sampling for this situation seems to be less successful
 # for w = 1.999 compared to the case w = 1.8 from the lecture.
