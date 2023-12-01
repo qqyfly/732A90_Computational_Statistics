@@ -1,0 +1,36 @@
+---
+title: "Computational Statistics Computer Lab 5 (Group 7)"
+author: 
+  - Qinyuan Qi(qinqi464)
+  - Satya Sai Naga Jaya Koushik	Pilla (satpi345)
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+## Question 1:  Hypothesis testing (Solved by Qinyuan Qi)
+
+### Answer:
+
+### (1.1)
+
+### (1.2)
+
+### (1.3)
+
+### (1.4)
+
+### (1.5)
+
+## Question 2: Bootstrap, jackknife and confidence intervals  (Solved by Satya Sai Naga Jaya Koushik	Pilla)
+
+### Answer:
+
+### (2.1)
+
+### (2.2)
+
+### (2.3)
+
+### (2.4)
+
+### (2.5)

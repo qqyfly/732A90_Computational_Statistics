@@ -82,7 +82,8 @@ generate_random_var_1a <- function(n, a) {
 
 a <- 0.5
 random_var_1a <- generate_random_var_1a(10000, a)
-hist(random_var_1a)
+hist(random_var_1a,freq = FALSE, nclass=100)
+hist(random_var_1a,breaks = "Sturges")
 var_of_random_var_1a <- var(random_var_1a)
 cat("variance of 1st method is",var_of_random_var_1a)
 ########################## [ 1 b ] #############################################
