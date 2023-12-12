@@ -278,8 +278,8 @@ $$
 
 And the code implementation as follows.
 
-```{r 2.2, eval=FALSE}
-rss_fun <- function(par,Sqrt,Price) {
+```{r 2.2}
+rss_fun <- function(par,SqFt,Price) {
 
   a1 <- par[1]
   a2 <- par[2]
@@ -308,7 +308,7 @@ c_func <- function(c, SqFt, Price) {
 
 c <- 150
 results <- c_func(c, SqFt = data$SqFt, Price = data$Price)
-
+results
 ```
 
 ### (2.3)
@@ -329,7 +329,7 @@ res1 = boot(data, stat1, R=1000)
 We calc the 95% confidence interval 
 ```{r 2.3.2, eval=FALSE}
 
-print(boot.ci(res1)) # , type = c("perc", "bca", "basic")
+print(boot.ci(res1)) 
 
 # plot
 plot(res1)
