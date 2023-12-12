@@ -47,3 +47,4 @@ hist(left_data$time, breaks = 100)
 # question 6
 # use se a parametric bootstrap to implement a function and then compare it with
 # the data we generated, and then write some comment.
+

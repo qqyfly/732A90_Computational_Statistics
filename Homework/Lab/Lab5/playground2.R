@@ -92,7 +92,7 @@ jackknife <- function(data, fun) {
   return(list(estimates = estimates, jackknife_var = jackknife_var))
 }
 
-
+# not working here
 jackknife_results <- jackknife(c, function(c_val) {
   c_func(c_val, SqFt, Price)$params[1]
 })
