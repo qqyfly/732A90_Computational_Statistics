@@ -61,13 +61,13 @@ results
 stat1 <- function(data,vn){
     data = as.data.frame(data[vn,])
     res <- c_func(c, SqFt = data$SqFt, Price = data$Price)
-    return(res$c)
+    return(res$param[4])
 }
 
 set.seed(12345)
 res1 = boot(data, stat1, R=1000)
 
-print(boot.ci(res1)) # , type = c("perc", "bca", "basic")
+print(boot.ci(res1)) 
 
 # plot
 plot(res1)
@@ -93,7 +93,7 @@ jackknife <- function(data, fun) {
 }
 
 
-jackknife_results <- jackknife(c_values, function(c_val) {
+jackknife_results <- jackknife(c, function(c_val) {
   c_func(c_val, SqFt, Price)$params[1]
 })
 

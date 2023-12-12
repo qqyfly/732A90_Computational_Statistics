@@ -302,7 +302,7 @@ c_func <- function(c, SqFt, Price) {
   opt_pars <- result$par
   rss <- result$value
   
-  return(list(c = c, params = opt_pars, rss = rss))
+  return(list(c = opt_pars, params = opt_pars, rss = rss))
 }
 
 
@@ -314,20 +314,20 @@ results
 ### (2.3)
 We estimate the distribution of c using bootstrap 
 
-```{r 2.3.1, eval=FALSE}
+```{r 2.3.1}
 stat1 <- function(data,vn){
     data = as.data.frame(data[vn,])
     res <- c_func(c, SqFt = data$SqFt, Price = data$Price)
-    return(res$c)
+    return(res$param[4])
 }
 
 set.seed(12345)
 res1 = boot(data, stat1, R=1000)
-
+res1
 ```
 
 We calc the 95% confidence interval 
-```{r 2.3.2, eval=FALSE}
+```{r 2.3.2,warning=FALSE}
 
 print(boot.ci(res1)) 
 
