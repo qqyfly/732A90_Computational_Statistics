@@ -14,10 +14,10 @@ filtered_data <- data[data$cens != 2,]
 layout(matrix(c(1:2), 1, 2))
 
 # plot the data
-hist(data$time, breaks = 50)
+hist(data$time, breaks = 100)
 
 # plot the left data
-hist(filtered_data$time, breaks = 50)
+hist(filtered_data$time, breaks = 100)
 
 # comment:
 # Accoridng to the plots , we can see that the left_data get sparser and not
