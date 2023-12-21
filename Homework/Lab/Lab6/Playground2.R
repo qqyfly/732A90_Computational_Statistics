@@ -2,25 +2,22 @@
 
 library(ggplot2)
 
-
 # Question 1(DONE)
 
 # Load data
 data <- read.csv("./Homework/Lab/Lab6/censoredproc.csv", 
                 sep = ";", header = TRUE)
 
-
-
-# Since we don't use the failure row, so all the rows with cens = 1 are filtered
-left_data <- data[data$cens == 2,]
+# Since we don't use the failure row, so all the rows with cens = 2 are filtered out
+filtered_data <- data[data$cens != 2,]
 
 layout(matrix(c(1:2), 1, 2))
 
 # plot the data
-hist(data$time, breaks = 100)
+hist(data$time, breaks = 50)
 
 # plot the left data
-hist(left_data$time, breaks = 100)
+hist(filtered_data$time, breaks = 50)
 
 # comment:
 # Accoridng to the plots , we can see that the left_data get sparser and not
