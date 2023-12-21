@@ -35,6 +35,25 @@ output: pdf_document
 
 ### (1):
 
+```{r}
+# Load data
+data <- read.csv("censoredproc.csv", 
+                sep = ";", header = TRUE)
+
+# Since we don't use the failure row, so all the rows with cens = 2 are filtered out
+filtered_data <- data[data$cens != 2,]
+
+layout(matrix(c(1:2), 1, 2))
+
+# plot the data
+hist(data$time, breaks = 100, main="Hist of filtered data")
+
+# plot the filtered data
+hist(filtered_data$time, breaks = 100, main="Hist of filtered data")
+
+
+```
+
 ### (2):
 
 ### (3):
