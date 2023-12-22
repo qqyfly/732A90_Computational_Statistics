@@ -140,7 +140,7 @@ fitness <- function(config) {
               num_attacked_queens = 1 - num_unattacked_queens))
 }
 
-# (x,y) encoding
+# (x,y) pair encoding
 init_configuration_1 <- function(board_size = 8) {
   configuration <- data.frame(x = c(), y = c())
   queen_count <- 0
@@ -156,6 +156,33 @@ init_configuration_1 <- function(board_size = 8) {
     }
   }
   return(configuration)
+}
+
+# binary encoding
+# if board_size = 8, then the max n is 2^8 - 1 = 255
+init_configuration_2 <- function(board_size = 8) {
+  max_value <- 2^board_size - 1
+  queen_count <- 0
+  index <- 1
+  configuration <- rep(0, board_size)
+  max_try <- 1000
+  while(queen_count < board_size && max_try > 0) {
+    number <- sample(0:max_value, 1)
+    new_queen <- sum(as.numeric(intToBits(number)))
+    if (queen_count + new_queen <= board_size && new_queen > 0) {
+      configuration[index] <- number
+      index <- index + 1
+      queen_count <- queen_count + new_queen
+    }
+    max_try <- max_try - 1
+  }
+
+  if(max_try == 0) {
+    print("Error: cannot generate a configuration")
+  }
+  print(queen_count)
+  return(configuration)
+
 }
 
 # binary encoding

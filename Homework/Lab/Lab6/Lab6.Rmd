@@ -11,7 +11,73 @@ output: pdf_document
 
 ### Answer:
 
+```{r setup1, include=FALSE}
+########################## Init code for question 1 ############################
+rm(list = ls())
+library(ggplot2)
+set.seed(12345)
+```
 ### (1):
+
+We define 3 encodings accordingly, the following codes are the init code to generate the init config.
+
+```{r 1.1}
+########################## Config Encoding Function 1.1 ############################
+# n pairs encoding
+init_configuration_1 <- function(board_size = 8) {
+  configuration <- data.frame(x = c(), y = c())
+  queen_count <- 0
+  for (i in 1:board_size) {
+    for(j in 1:board_size) {
+      isQueen <- sample(c(0, 1), 1)
+      if (queen_count < board_size) {
+        if (isQueen == 1){
+          configuration <- rbind(configuration, c(i, j))
+          queen_count <- queen_count + 1
+        }
+      }
+    }
+  }
+  return(configuration)
+}
+
+# binary encoding
+# if board_size = 8, then the max n is 2^8 - 1 = 255
+init_configuration_2 <- function(board_size = 8,max_try_count = 1000) {
+  max_value <- 2^board_size - 1
+  queen_count <- 0
+  index <- 1
+  configuration <- rep(0, board_size)
+  max_try_count <- 1000
+  while(queen_count < board_size && max_try > 0) {
+    number <- sample(0:max_value, 1)
+    new_queen <- sum(as.numeric(intToBits(number)))
+    if (queen_count + new_queen <= board_size && new_queen > 0) {
+      configuration[index] <- number
+      index <- index + 1
+      queen_count <- queen_count + new_queen
+    }
+    max_try_count <- max_try_count - 1
+  }
+
+  if(max_try_count == 0) {
+    print("Error: cannot generate a configuration")
+  }
+
+  return(configuration)
+
+}
+
+# vector position encoding
+init_configuration_3 <- function(board_size = 8) {
+  configuration <- sample(1:board_size, board_size)
+  return(configuration)
+}
+
+```
+
+
+
 
 ### (2):
 
@@ -118,6 +184,7 @@ $$
 
 ### (4):
 
+```{r}
 # Function to compute the E-step
 estep <- function(lambda, x, c) {
   return(lambda / c * exp(-lambda * x))
@@ -165,6 +232,7 @@ result <- em_algorithm(initial_lambda, observed_data, truncation_point)
 # Print the result
 cat("Estimated lambda:", result$lambda, "\n")
 cat("Number of iterations:", result$iterations, "\n")
+```
 
 ### (5):
 
