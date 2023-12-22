@@ -19,7 +19,7 @@ hist(data$time, breaks = 100, main="Hist of filtered data")
 # plot the filtered data
 hist(filtered_data$time, breaks = 100, main="Hist of filtered data")
 
-# comment:
+# TODO: comment:
 # Accoridng to the plots , we can see that the left_data get sparser and not
 # converge to 0,  as what we saw at the plot 1.
 
