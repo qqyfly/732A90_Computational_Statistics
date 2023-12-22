@@ -1,11 +1,14 @@
 # set random seed
 set.seed(12345)
-
+library(bitops)
+library(ggplot2)
 #DONE
 crossover <- function(config1, config2, p = 4){
   ncol <- length(config1)
   child_config <- config1
-  child_config[p + 1:ncol] <- config2[1:p]
+  for(i in 1:(ncol-p)){
+    child_config[p+i] = config2[i]
+  }
   return(child_config)
 }
 
@@ -45,10 +48,7 @@ mutate3 <- function(config) {
   ncol <- length(config)
   mutated_config <- config
   queen_to_mutate <- sample(1:ncol, 1)
-  new_position <- mutated_config[queen_to_mutate]
-  new_y <- sample(1:ncol, 1)
-  new_position[2] <- new_y
-  mutated_config[queen_to_mutate] <- new_position
+  mutated_config[queen_to_mutate] <- sample(1:ncol, 1)
   return(mutated_config)
 }
 
@@ -60,33 +60,24 @@ fitness1 <- function(config) {
 
 # encoding (X) represent a number whose binary string shows 
 # the position of the queen in the current row
-
-find_set_bits_indices <- function(n) {
-  if (n == 0) {
-    return(NULL) 
-  }
+find_set_bits_indices <- function(n,board_size) {
+  bit_vector <- rev(intToBits(n)[1:board_size])
   
-  bit_indices <- integer(0)
-  bit_index <- 1
-  
-  while (n > 0) {
-    if ((n & 1) == 1) {
-      bit_indices <- c(bit_indices, bit_index)
+  for(i in 1:length(bit_vector)){
+    if (bit_vector[i] == 1){
+      bit_indice <- i
+      break
     }
-    n <- bitshift(n, -1)
-    bit_index <- bit_index + 1
   }
-  
-  return(bit_indices)
+  return(bit_indice)
 }
 
 fitness2 <- function(config) {
   new_config <- data.frame(x = c(), y = c())
-  row_number <- nrow(config)
+  row_number <- length(config)
   for(i in 1:row_number){
     number <- config[i]
-    queen_pos <- find_set_bits_indices(number)
-    queen_pos <- row_number - queen_pos
+    queen_pos <- find_set_bits_indices(number,row_number)
     new_config <- rbind(new_config, c(i,config[i]))
   }
   return(fitness(new_config))
@@ -99,7 +90,7 @@ fitness2 <- function(config) {
 # DONE
 fitness3 <- function(config) {
   new_config <- data.frame(x = c(), y = c())
-  queen_num <- nrow(config)
+  queen_num <- length(config)
   for(i in 1:queen_num){
     new_config <- rbind(new_config, c(i,config[i]))
   }
@@ -112,8 +103,8 @@ fitness3 <- function(config) {
 # check attack between queen position
 is_attack <- function(queen1, queen2) {
   return(
-    queen1$x == queen2$x || queen1$y == queen2$y || 
-    abs(queen1$x - queen2$x) == abs(queen1$y - queen2$y)
+    queen1[1] == queen2[1] || queen1[2] == queen2[2] || 
+    abs(queen1[1] - queen2[1]) == abs(queen1[2] - queen2[2])
   )
 }
 
@@ -136,8 +127,8 @@ fitness <- function(config) {
   valid <- (length(unique(attacked_queens)) == 0)
 
   return(list(valid = valid,
-              num_unattacked_queens, 
-              num_attacked_queens = 1 - num_unattacked_queens))
+              num_unattacked_queens = num_unattacked_queens, 
+              num_attacked_queens = queen_num - num_unattacked_queens))
 }
 
 # (x,y) pair encoding
@@ -160,54 +151,56 @@ init_configuration_1 <- function(board_size = 8) {
 
 # binary encoding
 # if board_size = 8, then the max n is 2^8 - 1 = 255
-init_configuration_2 <- function(board_size = 8) {
+init_configuration_2 <- function(board_size = 8,max_try_count = 1000) {
   max_value <- 2^board_size - 1
   queen_count <- 0
   index <- 1
   configuration <- rep(0, board_size)
-  max_try <- 1000
+  max_try_count <- 1000
   while(queen_count < board_size && max_try > 0) {
     number <- sample(0:max_value, 1)
+    
     new_queen <- sum(as.numeric(intToBits(number)))
-    if (queen_count + new_queen <= board_size && new_queen > 0) {
+    if (queen_count + new_queen <= board_size && new_queen == 1) {
       configuration[index] <- number
       index <- index + 1
       queen_count <- queen_count + new_queen
     }
-    max_try <- max_try - 1
+    max_try_count <- max_try_count - 1
   }
 
-  if(max_try == 0) {
+  if(max_try_count == 0) {
     print("Error: cannot generate a configuration")
   }
-  print(queen_count)
+
   return(configuration)
 
 }
 
 # binary encoding
 # if board_size = 8, then the max n is 2^8 - 1 = 255
-init_configuration_2 <- function(board_size = 8) {
+init_configuration_2 <- function(board_size = 8,max_try_count = 1000) {
   max_value <- 2^board_size - 1
   queen_count <- 0
   index <- 1
   configuration <- rep(0, board_size)
-  max_try <- 1000
-  while(queen_count < board_size && max_try > 0) {
+  max_try_count <- 1000
+  while(queen_count < board_size && max_try_count > 0) {
     number <- sample(0:max_value, 1)
+    
     new_queen <- sum(as.numeric(intToBits(number)))
-    if (queen_count + new_queen <= board_size && new_queen > 0) {
+    if (queen_count + new_queen <= board_size && new_queen == 1) {
       configuration[index] <- number
       index <- index + 1
       queen_count <- queen_count + new_queen
     }
-    max_try <- max_try - 1
+    max_try_count <- max_try_count - 1
   }
 
-  if(max_try == 0) {
+  if(max_try_count == 0) {
     print("Error: cannot generate a configuration")
   }
-  print(queen_count)
+
   return(configuration)
 
 }
@@ -223,7 +216,6 @@ init_configuration_3 <- function(board_size = 8) {
 # otherwise, there is no queen on this cell
 
 print_board <- function(configuration, method = 1) {
-  
   if(method == 1) {
     n <- dim(configuration)[1]
     config <- matrix(0, nrow = n, ncol = n)
@@ -236,7 +228,7 @@ print_board <- function(configuration, method = 1) {
     config <- matrix(0, nrow = n, ncol = n)
     for (i in 1:n) {
       number <- configuration[i]
-      for (j in 1:n) {
+      for (j in n:1) {
         config[i, j] <- number %% 2
         number <- number %/% 2
       }
@@ -281,40 +273,93 @@ board_size <- 8
 p_val <- 4
 
 configuration <- init_configuration_1(board_size)
-# configuration
-# print_board(configuration, 1)
+configuration
+print_board(configuration, 1)
+fitness1(configuration)
+mutate1(configuration)
 
 configuration <- init_configuration_2(board_size)
-#configuration
-#print_board(configuration, 2)
+configuration
+print_board(configuration, 2)
+fitness2(configuration)
+mutate2(configuration)
+
+configuration <- init_configuration_3(board_size)
+configuration
+print_board(configuration, 3)
+fitness3(configuration)
+mutate3(configuration)
+
+# Method1
+
+# Method2
+
+# Method3
 
 configuration3_1 <- init_configuration_3(board_size)
-
+val_3_1 <- fitness3(configuration3_1)
 configuration3_2 <- NULL
 
-val_3_1 <- fitness3(configuration)
+max_steps <- 100
+steps <- 0
+num_attacked_queens_vector <- c(val_3_1$num_attacked_queens)
 
-while(!val_3_1.b.valid) {
+while(val_3_1$num_attacked_queens != 0 && steps <= max_steps ) {
 
-  if (configuration3_2 = NULL){
+  if (is.null(configuration3_2)){
     configuration3_2 <- init_configuration_3(board_size)    
-    val_3_2 <- mutate3(configuration3_2)
+    val_3_2 <- fitness3(configuration3_2)
   }
-  order(..., na.last = TRUE, decreasing = FALSE)
+  
   # cross over
   child_config <- crossover(configuration3_1, 
-                            configuration3_2， 
+                            configuration3_2,  
                             p = p_val)
  
+  # mutate
   mutated_config <- mutate3(child_config)
+  
+  val_child <- fitness3(mutated_config)
+  configs <- c(1,2,3)
+  num_attacked_queens <- c(val_3_1$num_attacked_queens,
+                    val_3_2$num_attacked_queens,
+                    val_child$num_attacked_queens)
+  df <- data.frame(config = configs, 
+                   num_attacked_queens = num_attacked_queens)
 
-  val <- fitness3(configuration)
-  if (val.valid){
-    break
+  custom_order <- order(df$num_attacked_queens)
+  sorted_df <- df[custom_order, ]
+  
+  # choose minial 2 values
+  if (sorted_df$config[1] == 1){
+    configuration3_1 <- configuration3_1
+    val_3_1 <- val_3_1
+  }else if(sorted_df$config[1] == 2){
+    configuration3_1 <- configuration3_2
+    val_3_1 <- val_3_2
+  }else {
+    configuration3_1 <- mutated_config
+    val_3_1 <- val_child
   }
-  if (val.num_unattacked_queens < min_val_3) {
-    min_val_3 <- val
-    print(min_val)
+
+  if (sorted_df$config[2] == 1){
+    configuration3_2 <- configuration3_1
+    val_3_2 <- val_3_1
+  }else if(sorted_df$config[2] == 2){
+    configuration3_2 <- configuration3_2
+    val_3_2 <- val_3_2
+  }else {
+    configuration3_2 <- mutated_config
+    val_3_2 <- val_child
   }
+
+  num_attacked_queens_vector <- c(num_attacked_queens_vector,val_3_1$num_attacked_queens)
+  steps <- steps + 1
+  print(val_3_1$num_attacked_queens)
 }
-print_board(configuration, 3)
+print_board(configuration3_1, 3)
+
+df3 <- data.frame(steps = 1:length(num_attacked_queens_vector),
+                  num_attacked_queens = num_attacked_queens_vector)
+ggplot(data=df3, aes(x = steps, y = num_attacked_queens)) + geom_line()
+
