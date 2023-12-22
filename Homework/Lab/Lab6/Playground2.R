@@ -14,6 +14,22 @@ filtered_data <- data[data$cens != 2,]
 layout(matrix(c(1:2), 1, 2))
 
 # plot the data
+df <- data.frame(value = data$time)
+
+histogram <- ggplot(df, aes(x = value)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  labs(title = "Histogram of Truncated Exponential Data", x = "Value") +
+  theme_minimal()
+
+# Add density curve
+density_curve <- histogram +
+  stat_function(fun = function(x) truncated_exp_density(x, estimated_lambda, truncation_point), 
+                color = "red", linewidth = 1) +  # Use 'linewidth' instead of 'size'
+  labs(title = "Histogram with Truncated Exponential Density Curve")
+
+# Display the plot
+print(density_curve)
+
 hist(data$time, breaks = 100, main="Hist of filtered data")
 
 # plot the filtered data
@@ -56,7 +72,7 @@ mstep <- function(lambda, x, c) {
 }
 
 # EM algorithm
-em_algorithm <- function(initial_lambda, observed_data, truncation_point, max_iter = 100, tol = 1e-3) {
+em_algorithm <- function(initial_lambda, observed_data, truncation_point, max_iter = 100, tol = 0.001) {
   lambda_current <- initial_lambda
   
   for (iter in 1:max_iter) {
@@ -78,17 +94,87 @@ em_algorithm <- function(initial_lambda, observed_data, truncation_point, max_it
   return(list(lambda = lambda_current, iterations = iter))
 }
 
-# Example usage
-set.seed(123)
-observed_data <- rexp(100, rate = 0.5)  # Simulated truncated exponential data
+set.seed(12345)
 truncation_point <- 2
 
 # Initial guess for lambda
-initial_lambda <- 0.5
+initial_lambda <- 100
 
 # Run EM algorithm
-result <- em_algorithm(initial_lambda, observed_data, truncation_point)
+result <- em_algorithm(initial_lambda, filtered_data, truncation_point)
 
 # Print the result
 cat("Estimated lambda:", result$lambda, "\n")
 cat("Number of iterations:", result$iterations, "\n")
+
+estimated_lambda <- result$lambda
+
+truncated_exp_density <- function(x, lambda, c) {
+  return(lambda * exp(-lambda * x) / (1 - exp(-lambda * c)))
+}
+
+# Add density curve
+x_values <- seq(0, 5, length.out = 100)
+curve(truncated_exp_density(x, estimated_lambda, truncation_point), col = "red", lwd = 2, add = FALSE, from = 0, to = 5)
+# Display the plot
+print(density_curve)
+
+hist(filtered_data, breaks = 20, col = "lightblue", main = "Histogram of Truncated Exponential Data", xlab = "Value")
+
+# Add density curve
+curve(truncated_exp_density(x, estimated_lambda, truncation_point), col = "red", lwd = 2, add = TRUE, from = 0, to = 5)
+
+# Function to calculate MLE for truncated exponential distribution
+calculate_mle <- function(data, c) {
+  n <- length(data)
+  lambda_hat <- n / sum(data)
+  return(lambda_hat)
+}
+
+# Function to simulate data, randomly censor, and estimate lambda
+simulate_and_estimate <- function(observed_data, truncation_point, num_simulations) {
+  results <- vector("list", length = num_simulations)
+
+  for (i in 1:num_simulations) {
+    # Record start time for each iteration
+    start_time_iter <- Sys.time()
+
+    # (a) Simulate data from exponential distribution
+    simulated_data <- rexp(length(observed_data), rate = estimated_lambda)
+
+    # (b) Randomly censor observations
+    censoring_times <- runif(length(observed_data), min = 0, max = truncation_point)
+    censored_data <- ifelse(simulated_data <= censoring_times, simulated_data, NA)
+
+    # (c) Estimate lambda using EM algorithm
+    em_result <- em_algorithm(initial_lambda, censored_data, truncation_point)
+    lambda_em <- em_result$lambda
+
+    # Estimate lambda using MLE based on uncensored observations
+    lambda_mle <- calculate_mle(simulated_data[!is.na(censored_data)], truncation_point)
+
+    # Record end time for each iteration
+    end_time_iter <- Sys.time()
+
+    # Store results and timing information
+    results[[i]] <- list(lambda_em = lambda_em, lambda_mle = lambda_mle, 
+                         time_taken = end_time_iter - start_time_iter)
+  }
+
+  return(results)
+}
+
+# Set the number of simulations
+num_simulations <- 1000
+
+# Record start time
+start_time <- Sys.time()
+
+# Perform simulations and estimates
+simulation_results <- simulate_and_estimate(filtered_data, truncation_point, num_simulations)
+
+# Record end time
+end_time <- Sys.time()
+
+# Print the results
+cat("Total Time:", end_time - start_time, "\n")
