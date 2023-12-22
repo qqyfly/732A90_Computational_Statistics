@@ -33,28 +33,37 @@ output: pdf_document
 
 ### Answer:
 
-### (1):
+```{r setup2, include=FALSE}
+########################## Init code for question 1 ############################
+rm(list = ls())
+library(ggplot2)
+set.seed(12345)
+```
+### (1) Plot 2 histograms:
 
-```{r}
+According to the plots generated, we found that the plot seems follow exponential distribution.
+
+```{r 2.1}
+################################## (2.1) #######################################
 # Load data
 data <- read.csv("censoredproc.csv", 
                 sep = ";", header = TRUE)
-
-# Since we don't use the failure row, so all the rows with cens = 2 are filtered out
+# We will filter out the records with cens = 2
 filtered_data <- data[data$cens != 2,]
-
 layout(matrix(c(1:2), 1, 2))
-
 # plot the data
 hist(data$time, breaks = 100, main="Hist of filtered data")
-
 # plot the filtered data
 hist(filtered_data$time, breaks = 100, main="Hist of filtered data")
-
-
 ```
 
 ### (2):
+
+The general PDF form of an exponential distribution is:
+
+$$
+f(x,\lambda) = \begin{cases} \lambda e^{\lambda x} & x \geq 0 \\ 0 & x < 0 \end{cases}
+$$
 
 ### (3):
 

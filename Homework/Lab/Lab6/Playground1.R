@@ -1,14 +1,11 @@
-# define max_iterations count
-max_iterations <- 200
-
 # set random seed
 set.seed(12345)
 
-crossover <- function(config1, config2, p = 4){
+crossover1 <- function(config1, config2, p = 4){
   ncol <- length(config1)
-  new_config <- config1
-  new_config[p + 1:ncol] <- config2[1:p]
-  return(new_config)
+  child_config <- config1
+  child_config[p + 1:ncol] <- config2[1:p]
+  return(child_config)
 }
 
 mutate <- function(config) {
@@ -20,7 +17,9 @@ fitness1 <- function(config) {
   # we will make a list of 
 }
 
-# encoding (X,Y) represent the position of the queen
+
+# encoding (X) represent a number whose binary string shows 
+# the position of the queen in the current row
 fitness2 <- function(config) {
   return(0)
 }
