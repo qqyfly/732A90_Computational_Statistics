@@ -48,8 +48,8 @@ According to the plots generated, we found that the plot seems follow exponentia
 # Load data
 data <- read.csv("censoredproc.csv", 
                 sep = ";", header = TRUE)
-# We will filter out the records with cens = 2
-filtered_data <- data[data$cens != 2,]
+# We will filter out the left-censored data which cens=2
+filtered_data <- data[data$cens ==1,]
 layout(matrix(c(1:2), 1, 2))
 # plot the data
 hist(data$time, breaks = 100, main="Hist of filtered data")
@@ -59,11 +59,39 @@ hist(filtered_data$time, breaks = 100, main="Hist of filtered data")
 
 ### (2):
 
-The general PDF form of an exponential distribution is:
+The general CDF form of an exponential distribution is:
 
 $$
-f(x,\lambda) = \begin{cases} \lambda e^{\lambda x} & x \geq 0 \\ 0 & x < 0 \end{cases}
+F(x,\lambda) = \begin{cases} 1 - e^{- \lambda x} & x \geq 0 \\ 0 & x < 0 \end{cases}
 $$
+
+So PDF of an exponential distribution is derivative of F on x:
+
+$$
+f(x,\lambda) = \begin{cases} \lambda e^{-\lambda x} & x \geq 0 \\ 0 & x < 0 \end{cases}
+$$
+
+
+Likelihood function for the exponential distribution is as follows.
+
+$$
+L(\lambda; x_{1},x_{2}...x_{n}) = \prod{f(x,\lambda)} = \lambda^{n} exp(-\lambda \sum_{j=1}^{n}x_{j})
+$$
+
+PDF for the truncated exponential distribution is derived as follows.
+
+$$
+P(X \leq x | X \leq c) = \frac{P(X \leq x, X \leq c)}{P(X \leq c)} = \frac{P(X \leq \lambda)}{P(X \leq c)} = \frac{\lambda e^{-\lambda x}}{ce^{-cx}}
+$$
+
+So likelihood function for the truncated exponential distribution is as follows.
+
+$$
+L(\lambda|X \leq c; x_{1},x_{2}...x_{n}) = \prod{P(X \leq x | X \leq c)} = \frac{\lambda^{n} exp(-\lambda \sum_{j=1}^{n}x_{j})}{c^{n} exp(-c \sum_{j=1}^{n}x_{j})}
+$$
+
+
+
 
 ### (3):
 
