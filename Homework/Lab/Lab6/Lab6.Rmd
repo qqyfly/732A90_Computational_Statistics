@@ -81,21 +81,90 @@ $$
 PDF for the truncated exponential distribution is derived as follows.
 
 $$
-P(X \leq x | X \leq c) = \frac{P(X \leq x, X \leq c)}{P(X \leq c)} = \frac{P(X \leq \lambda)}{P(X \leq c)} = \frac{\lambda e^{-\lambda x}}{ce^{-cx}}
+P(X \leq x | X \leq c) = \frac{P(X \leq x, X \leq c)}{P(X \leq c)} = \frac{P(X \leq \lambda)}{P(X \leq c)} = \frac{\lambda e^{-\lambda x}}{ce^{-cx}} = \frac{\lambda}{c}e^{-\lambda x}
 $$
 
 So likelihood function for the truncated exponential distribution is as follows.
 
 $$
-L(\lambda|X \leq c; x_{1},x_{2}...x_{n}) = \prod{P(X \leq x | X \leq c)} = \frac{\lambda^{n} exp(-\lambda \sum_{j=1}^{n}x_{j})}{c^{n} exp(-c \sum_{j=1}^{n}x_{j})}
+L(\lambda|X \leq c; x_{1},x_{2}...x_{n}) = \prod{P(X \leq x | X \leq c)} = (\frac{\lambda^{n}}{c^{n}}) exp(-\lambda \sum_{j=1}^{n}x_{j})
 $$
-
-
-
 
 ### (3):
 
+Since it's relative straight forward , we will use the likelihood function directly.
+
+So we will derive the EM function using the likelihood function in 2.2.
+
+E-Step:
+
+Let's compute the expectation of likelihood as follows.
+
+$$
+Q(\lambda,{\lambda}^{t}) = E(L(\lambda|X \leq c; x_{1},x_{2}...x_{n}),{\lambda}^{t})
+$$
+
+M-Step:
+
+In M Step , we need to maximum Q with respect to  $\lambda$.
+
+$$
+\lambda^{t+1} = argmax_{\lambda} Q(\lambda,{\lambda}^{t})
+$$
+
+$$
+Q(\lambda,{\lambda}^{t}) = E(L(\lambda|X \leq c; x_{1},x_{2}...x_{n}),{\lambda}^{t})
+$$
+
 ### (4):
+
+# Function to compute the E-step
+estep <- function(lambda, x, c) {
+  return(lambda / c * exp(-lambda * x))
+}
+
+# Function to compute the M-step
+mstep <- function(lambda, x, c) {
+  return(sum(x) / sum(c * exp(-lambda * x)))
+}
+
+# EM algorithm
+em_algorithm <- function(initial_lambda, observed_data, truncation_point, max_iter = 100, tol = 1e-6) {
+  lambda_current <- initial_lambda
+  
+  for (iter in 1:max_iter) {
+    # E-step
+    expected_values <- estep(lambda_current, observed_data, truncation_point)
+    
+    # M-step
+    lambda_next <- mstep(lambda_current, observed_data, expected_values)
+    
+    # Check for convergence
+    if (abs(lambda_next - lambda_current) < tol) {
+      break
+    }
+    
+    # Update lambda for the next iteration
+    lambda_current <- lambda_next
+  }
+  
+  return(list(lambda = lambda_current, iterations = iter))
+}
+
+# Example usage
+set.seed(123)
+observed_data <- rexp(100, rate = 0.5)  # Simulated truncated exponential data
+truncation_point <- 2
+
+# Initial guess for lambda
+initial_lambda <- 0.5
+
+# Run EM algorithm
+result <- em_algorithm(initial_lambda, observed_data, truncation_point)
+
+# Print the result
+cat("Estimated lambda:", result$lambda, "\n")
+cat("Number of iterations:", result$iterations, "\n")
 
 ### (5):
 

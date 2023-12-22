@@ -45,3 +45,50 @@ hist(filtered_data$time, breaks = 100, main="Hist of filtered data")
 # use se a parametric bootstrap to implement a function and then compare it with
 # the data we generated, and then write some comment.
 
+# Function to compute the E-step
+estep <- function(lambda, x, c) {
+  return(lambda / c * exp(-lambda * x))
+}
+
+# Function to compute the M-step
+mstep <- function(lambda, x, c) {
+  return(sum(x) / sum(c * exp(-lambda * x)))
+}
+
+# EM algorithm
+em_algorithm <- function(initial_lambda, observed_data, truncation_point, max_iter = 100, tol = 1e-3) {
+  lambda_current <- initial_lambda
+  
+  for (iter in 1:max_iter) {
+    # E-step
+    expected_values <- estep(lambda_current, observed_data, truncation_point)
+    
+    # M-step
+    lambda_next <- mstep(lambda_current, observed_data, expected_values)
+    
+    # Check for convergence
+    if (abs(lambda_next - lambda_current) < tol) {
+      break
+    }
+    
+    # Update lambda for the next iteration
+    lambda_current <- lambda_next
+  }
+  
+  return(list(lambda = lambda_current, iterations = iter))
+}
+
+# Example usage
+set.seed(123)
+observed_data <- rexp(100, rate = 0.5)  # Simulated truncated exponential data
+truncation_point <- 2
+
+# Initial guess for lambda
+initial_lambda <- 0.5
+
+# Run EM algorithm
+result <- em_algorithm(initial_lambda, observed_data, truncation_point)
+
+# Print the result
+cat("Estimated lambda:", result$lambda, "\n")
+cat("Number of iterations:", result$iterations, "\n")
