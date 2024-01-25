@@ -77,9 +77,14 @@ fun_loess_s <- function(formula,data,indices){
 bootstrap_sample_number <- 2000
 
 # bootstrap for linear regression
-boot_samples_lm <- boot(data, statistic = fun_lm_s, R = bootstrap_sample_number, formula=Draft_No  ~ Day_of_year,parallel = "multicore")
+data1 <- cbind(Predictor = data$Draft_No, Response = data$Day_of_year)
 
-boot_samples_loess <- boot(data, statistic = fun_loess_s, R = bootstrap_sample_number, formula=Draft_No  ~ Day_of_year,parallel = "multicore")
+boot_samples_lm <- boot(data1, fun_lm_s, R = 1000)
+
+
+boot_samples_lm <- boot(data$Draft_No, statistic = fun_lm_s, R = bootstrap_sample_number, formula=Draft_No  ~ Day_of_year,parallel = "multicore")
+
+boot_samples_loess <- boot(data$Draft_No, statistic = fun_loess_s, R = bootstrap_sample_number, formula=Draft_No  ~ Day_of_year,parallel = "multicore")
 
 # calculate mean of bootstrap sample statistics
 mean_boot_samples_lm <- mean(boot_samples_lm$t)

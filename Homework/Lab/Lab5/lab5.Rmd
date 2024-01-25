@@ -21,7 +21,7 @@ set.seed(12345)
 
 ### (1.1) Make a scatter plot of Y versus X and conclude
 
-The plot as follows, and according to the plot, the pattern is not very clear.So it seems to be random distributed.
+The plot is as follows, and according to the plot, the pattern is not very clear.So it seems to be random distributed.
 
 ```{r 1.1, echo=FALSE}
 ################################## (1.1) #######################################
@@ -92,7 +92,7 @@ According to the plot, 2 plots are not symmetrical, also both of them not not fo
 
 ```{r 1.3, echo=FALSE}
 ################################## (1.3) #######################################
-# boot function fot lm
+# boot function for lm
 fun_lm_s <- function(formula,data,indices){
   d <- data[indices, ]
   lm_mod <- lm(formula, data = d)
@@ -102,7 +102,7 @@ fun_lm_s <- function(formula,data,indices){
   return(s_lm)
 }
 
-# boot function fot loess
+# boot function for loess
 fun_loess_s <- function(formula,data,indices){
   d <- data[indices, ]
   loess_mod <- loess(formula, data = d, se = TRUE)

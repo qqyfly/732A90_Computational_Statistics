@@ -14,14 +14,20 @@ output: pdf_document
 ```{r setup1, include=FALSE}
 ########################## Init code for question 1 ############################
 rm(list = ls())
+library(ggplot2)
 ```
 
 ### (A)
-Since we need to find a envelope function for the density function, so we need
-to plot the density function first. let $x \in [-3, 3]$, and we know it's  
-triangle sharped function. We also can plot it using the code(Check appendix).
-the target function $g(x) = 1$ in $[-1,1]$, otherwise $g(x) = 0$
-Since we set a = 0.5, so e(x) = g / a = 2 is our simple envelope function.
+We define an envelope function to cover the density function.
+$$
+g(x) = \left\{ 
+\begin{array}{ll}
+1, &\text{if } -1\leq x \leq 1\\
+0,&\text{otherwise}
+\end{array} \right.
+$$
+
+where $a = 0.5$, $e(x) = g / a = 2$ 
 
 ```{r 1a1 , echo=FALSE}
 ########################## [ 1 a1 ] #############################################
@@ -51,15 +57,14 @@ graph <- ggplot2::ggplot(data) +
   ggplot2::geom_line(mapping=ggplot2::aes(x=x,y=z),color="blue") + 
   ggplot2::ggtitle("Density function of X and envelope function") +
   ggplot2::xlab("x") +
-  ggplot2::ylab("y,z")
+  ggplot2::ylab("y,z")+
+  theme(plot.title = element_text(hjust = 0.5))
 
 graph
 ```
-After we get the plot, we can see that the density function is a triangle we 
-will use an envelope function to cover the density function, and we can
-use function $ g(x) = 1 $ to cover the density function in the [-1,1] range. 
 
-Now we will write a code for the rejection sampling algorithm
+The following code is the implementation of rejection sampling algorithm.
+
 our g function is $g(x) = 1$ in the range $[-1,1]$, otherwise $g(x) = 0$
 our e function is $e(x) = 1 / a$ in the range $[-1,1]$, otherwise $e(x) = 0$
 and we will use $a = 0.5$ here.
@@ -76,15 +81,7 @@ generate_random_var_1a <- function(n, a) {
   while (count <= n) {
 
     x <- runif(1, -1, 1)
-    # Calculate the acceptance probability
     u <- runif(1)
-
-    # since g will always be 1 in the range [-1,1], so y = 1
-    # f1(Y) = 1 - Y and e(Y) = 1 / a = 2
-    # f2(Y) = Y + 1 and e(Y) = 1 / a = 2
-    # so we have f(Y) / e(Y) = (1 - Y) / 2 or Y+1 / e
-
-    # Calculate the acceptance probability
 
     if (x > 0 && u <= (1 - x) / e) {
       samples[count] <- x
@@ -101,52 +98,62 @@ generate_random_var_1a <- function(n, a) {
 }
 
 a <- 0.5
+set.seed(12345)
 random_var_1a <- generate_random_var_1a(10000, a)
-hist(random_var_1a)
+ggplot2::ggplot(data.frame(x = random_var_1a), aes(x)) + 
+  ggplot2::geom_histogram(bins = 50) + 
+  ggplot2::ggtitle("Histogram of random_var_1a") +
+  ggplot2::xlim(-1,1)+
+  theme(plot.title = element_text(hjust = 0.5))
 var_of_random_var_1a <- var(random_var_1a)
 cat("variance of 1st method is",var_of_random_var_1a)
 ```
 
 ### (B)
 
-To generate a random variable from the density function using Inverse CDF,
-we will need to calculate the CDF function first.
-
-CDF function as follows:
-
+According to lecture 3 slides 9-10, we let 
 $$
-CDF = 
-\begin{cases}
-    0 ,& \text{if }  x \in (-\infty,-1) \\
-    \frac{x^2}{2} + x,& \text{if }  x \in (-1,0) \\
-    x - \frac{x^2}{2},& \text{if }  x \in (0,1) \\
-    1,& \text{if } x \in (1,\infty) 
-\end{cases}
-$$
-Since -Y has a triangle  distribution on $[-1,0]$, so we have 
-
-$$
-F^{-1} = 
-\begin{cases}
-    x = -1 + \sqrt{1-2y},& \text{if }  x \in [-1,0) \\
-    x =  1 - \sqrt{1-2y},& \text{if }  x \in[0,1] \\
-    0, Otherwise 
-\end{cases}
+f(x) = \left\{ 
+\begin{array}{ll}
+2-2x, &\text{if } 0\leq x \leq 1\\
+0,&\text{otherwise}
+\end{array} \right.
 $$
 
-The following is the function to generate a random variable from it.
+and have 
+$$
+F(x) = \int_{-\infty}^{x}f(t)dt = \left\{
+\begin{array}{ll}
+0, & \text{if } x < 0\\
+2x-x^2, & \text{if } 0 \leq x \leq 1\\
+1, & \text{if } x > 1
+\end{array} \right.
+$$
+
+then 
+$$
+F^{-1}(y) = 1 - \sqrt{1-y}
+$$
+
+For -Y,  do the same and we have $x = -1 + \sqrt{1-y}$
 
 ```{r 1b}
 ########################## [ 1 b ] #############################################
 generate_random_var_1b <- function(n){
   u <- runif(n)
-  x1 <-  - 1 + sqrt(1 - 2 * u)
-  x2 <-  1 - sqrt(1 - 2 * u)
+  x1 <-  - 1 + sqrt(1 - u)
+  x2 <-  1 - sqrt(1 - u)
   return(c(x1, x2))
 }
 
+set.seed(12345)
 random_var_1b <- generate_random_var_1b(10000)
-hist(random_var_1b)
+ggplot2::ggplot(data.frame(x = random_var_1b), aes(x)) + 
+  ggplot2::geom_histogram(bins = 50) + 
+  ggplot2::ggtitle("Histogram of random_var_1b") +
+  ggplot2::xlim(-1,1)+
+  theme(plot.title = element_text(hjust = 0.5))
+
 
 var_of_random_var_1b <- var(random_var_1b)
 cat("variance of 2nd method is",var_of_random_var_1b)
@@ -164,31 +171,38 @@ generate_random_var_1c <- function(n){
 }
 
 random_var_1c <- generate_random_var_1c(10000)
-hist(random_var_1c)
+ggplot2::ggplot(data.frame(x = random_var_1c), aes(x)) + 
+  ggplot2::geom_histogram(bins = 50) + 
+  ggplot2::ggtitle("Histogram of random_var_1c") +
+  ggplot2::xlim(-1,1)+
+  theme(plot.title = element_text(hjust = 0.5))
+
 var_of_random_var_1c <- var(random_var_1c)
 cat("variance of 3rd method is",var_of_random_var_1c)
 ```
 
 ### (D)
 
-Since we already plot the data, we will not plot them here.
+Since we already plotted the data, we will not plot them here.
 
-The variance of the three method is: 0.1691043, NA and 0.1699383.
+The variance of the three methods is as follows
 
-|             | variance | 
-|:---:        |:---:     |
-| 1a          |0.1691043 |
-| 1b          |NA        |
-| 1c          |0.1699383 |
+|    | variance                | 
+|:--:|:-----------------------:|
+| 1a |`r var_of_random_var_1a` |
+| 1b |`r var_of_random_var_1b` |
+| 1c |`r var_of_random_var_1c` |
 
-The 2nd method generate lots of NA value , so the variance is NA.
+According to the result, the 1a method, which is rejection sampling has the smallest variance.
 
-According to the result , the 1st method, which is rejection sampling have the smallest variance.
+1c is the simplest way to generate the random variable, but it 
+can not adapt to some specific distribution.
 
-since the 1c is the simplest way to generate the random variable, but since it 
-can not adapt to some specific distribution, for 1b , since we need to calculate 
-CDF and inverse function, in some cases, it's hard to do that, so we will use 
-1a to generate the random variable(also because of the smallest variance).
+For method 1b, since we need to calculate CDF and inverse function, 
+in some cases, it's hard to do that.
+
+Based on the statement above, we will use  1a to generate the random 
+variable(also because it has the smallest variance).
 
 
 ## Question 2:  Laplace distribution (Solved by Satya Sai Naga Jaya Koushik	Pilla)
@@ -199,147 +213,159 @@ CDF and inverse function, in some cases, it's hard to do that, so we will use
 ########################## Init code for question 2#############################
 knitr::opts_chunk$set(echo = TRUE)
 rm(list = ls())
+library(ggplot2)
 ```
 #### (a) 
 
-We have the function
+We have
 
 $$
-DE(\mu,\lambda) = \frac{\lambda}{2} exp(-\lambda|x-\mu|)
+DE(\mu,\lambda) = \frac{\lambda}{2} e^{-\lambda|x-\mu|}
 $$
 
-Calculate the integral of the function on x to get CDF
-since $\mu = 0$ and $\lambda = 1$, we have $\frac{1}{2} exp(-1|x|)$.
-Also because we have a absolute value, we need to split the integral into two parts.
+The related CDF function is expressed as follows.
 
 $$
-f(x) = 
-\begin{cases}
-  \frac{1}{2} * exp(-x)\\
-  \frac{1}{2} * exp(x)
-\end{cases}
+F_{DE}(x) = 
+\left\{
+\begin{matrix}
+\frac{1}{2} e^{\lambda(x-\mu)} && x < \mu\\ 
+1 - \frac{1}{2} e^{-\lambda(x-\mu)} && x \geq \mu 
+\end{matrix}
+\right.
 $$
 
-We calculate the CDF
+Combine them using the sign function, we have
 
 $$
-CDF = 
-\begin{cases}
-- \frac{1}{2}exp(-x) ,for x >= 0\\
-  \frac{1}{2}exp(x)  ,for x < 0
-\end{cases}
+F_{DE}(x) = 
+\frac{1}{2} + \frac{1}{2} sign(x-\mu) (1 - e^{-\lambda|x-\mu|})
 $$
 
-Then we calculate the inverse function of CDF
+Then we calculate the inverse function of CDF using the given $\mu = 1$ and $\lambda = 0$.
+
 $$
-F^{-1}(y) = 
-\begin{cases}
-log(2y)   ,for x < 0\\
--log(-2y) ,for x >= 0
-\end{cases}
+F_{DE}^{-1}(x) = \mu_{DE} - \frac{1}{\lambda} sign(\mu - 0.5) ln(1 - 2|\mu - 0.5|) 
 $$
 
-According to the plot, we know that most of the data are located in [-3,3] area.
+According to the formula above, we can generate random variables following a Laplace distribution.
 
 ```{r 2.a}
 ########################## [ 2 a ] ######################################
 
-generate_random_var_2a <- function(n){
-  u <- runif(n,0,1)
-  x1 <-  log(2 * u)
-  x2 <-  - log(- 2  * (- 1) * u)
-  return(c(x1, x2))
+laplace_dist <- function(mu, lambda, p){
+  return(mu - (1 / lambda) * sign(p - 0.5) * log(1 - 2 * abs(p - 0.5)))
 }
 
-random_var_2a <- generate_random_var_2a(10000)
-hist(random_var_2a)
+n = 10000
+
+x_rand <- runif(n,0,1)
+data1 <- data.frame(x_unif = x_rand)
+
+data1$laplace <- laplace_dist(0,1,x_rand)
+
+ggplot(data1, aes(laplace)) + 
+  geom_histogram(aes(y=..density..), bins = 50) + 
+  geom_density(alpha=0.2,fill="#FF6666") + 
+  ggtitle("Histogram of random laplace dist") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
+
+According to the plot, the plot we generated follows the Laplace distribution.
 
 #### (b) 
 
-Now we will write code for the rejection sampling algorithm. 
-since $\mu = 0$ and $\lambda = 1$, we have
-$$
-g(x) =
-\begin{cases}
-1/2 * exp(-x), for x >= 0 \\
-1/2 * exp(x), for x < 0
-\end{cases}
-$$
+Since $\mu = 0$ and $\lambda = 1$, we have PDF of laplace distribution as follows.
 
-Our e function is $e(x) = g(x) / a$,  which means 
 $$
-e(x) = 
-\begin{cases}
-1 / (2a) * exp(-x)$ for $x >= 0 \\
-1 / (2a) * exp(x) for x < 0
-\end{cases}
+f_{l}(x) =
+\frac{1}{2}  e^{-|x|} = 
+\left\{
+\begin{matrix}
+\frac{1}{2}  e^{-x} && x >= 0 \\
+\frac{1}{2}  e^{x}  && x < 0
+\end{matrix}
+\right.
 $$
 
-we will use $a = 0.5$ here.
-According to the execute result , we know that the average rejection rate is 0.4430274.
+Meanwhile, we have PDF of the normal distribution as follows.
 
-For the first plot random_var_2b1, the data is mostly located in [-2,2] area.
-For the second plot random_var_2b2, the data is mostly located in [-3,3] area.
+$$
+f_{n}(x) = \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}}
+$$
 
+Since
+
+$$
+\frac{f_{n}(x)} {f_{l}(x)} = \sqrt{\frac{2}{\pi}}e^{(-\frac{x^2}{2}+|x|)}
+$$
+
+When $x=\pm{1}$, this expression will get its maximum value.
+
+$$
+a = max \frac{f_{n}(x)}{f_{l}(x)} = \sqrt{\frac{2}{\pi}}e^{\frac{1}{2}}
+$$
+
+Using this a value, we can generate the random variables that are needed.
+
+The histogram of the random variable is generated as below, the real rejection rate R is 0.2503748 and the expected rejection rate E(R) is 0.2398265 which is very close to each other.
+
+The two histogram plots below are almost the same.
 
 ```{r 2.b}
 ########################## [ 2 b ] #############################################
+# calc a value using the formula above
+a <- sqrt(2/pi)*exp(0.5)
 
-# generate a function to show normal distribution
-
-normal_distribution_function <- function(x){
-  return(1 / sqrt(2 * pi) * exp(-x^2 / 2))
+# pdf of normal distribution
+pdf_normal <- function(x){
+  return(exp(-x^2 / 2) / sqrt(2 * pi))
 }
 
-generate_random_var_2b <- function(n, a) {
-  samples <- numeric(n)
-  # Generate a sample from the proposal distribution in [-1,1]
-  count <- 1
-  execute_count <- 1
+# pdf of laplace distribution
+pdf_laplace <- function(x){
+  return(0.5 * exp(-abs(x)))
+}
 
-  while (count <= n) {
+n2 <- 2000
 
-    x <- runif(1, -5, 5)
-    # Calculate the acceptance probability
-    u <- runif(1)
+# save generated samples in this vector
+samples <- c()
 
-    # since g will always be 1 in the range [-1,1], so y = 1
-    # f(Y) = \frac{1}{\sqrt{2*pi}} * e^{\frac{1}{2} x^2 } 
-    # so we have f(Y) / e(Y) have 2 choices
-
-    # Calculate the acceptance probability
-    f_val <- normal_distribution_function(x)
-
-    if (x < 0){
-      e <- exp(-x)
-      if (u <= (f_val / e)) {
-        samples[count] <- x
-        count <- count + 1
-      }
-    } else{
-      e <- exp(x)
-      if (u <= (f_val / e)) {
-        samples[count] <- x
-        count <- count + 1
-      }
-    }
-    execute_count <- execute_count + 1
+for(i in 1:n){
+  if (length(samples) >= n2) {
+    break
   }
-  cat("Average rejection rate: ", (execute_count - count) / execute_count, "\n")
-  return(samples)
+  
+  Y = data1$laplace[i]
+  u = runif(1)
+  g = pdf_laplace(Y)
+  f = pdf_normal(Y)
+
+  if (u <=f/(a * g)) {
+    samples <- c(samples, Y)
+  }
 }
 
-a <- 0.2
-random_var_2b1 <- generate_random_var_2b(10000, a)
-hist(random_var_2b1)
+cat("Rejection rate R: ", 1 - (n2 / i), "\n")
+cat("rejection rate E(R): ", 1 - (1 / a), "\n")
+
+data2 <- data.frame(normal = samples)
+ggplot(data2, aes(normal)) + 
+  geom_histogram(aes(y=..density..), bins = 50) + 
+  geom_density(alpha=0.2,fill="#FF6666") + 
+  ggtitle("Histogram of normal dist(rejection sampling)") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 
 # Generate 2000 random variables from the distribution using rnorm
-random_var_2b2 <- rnorm(2000, 0, 1)
-hist(random_var_2b2)
+random_var_2b2 <- rnorm(n2, 0, 1)
 
-
+ggplot2::ggplot(data.frame(x = random_var_2b2), aes(x)) + 
+   geom_histogram(aes(y=..density..), bins = 50) + 
+   geom_density(alpha=0.2,fill="#FF6666") + 
+   ggplot2::ggtitle("Histogram of normal dist(rnorm)") +
+   theme(plot.title = element_text(hjust = 0.5))
 ```
 
 \newpage
