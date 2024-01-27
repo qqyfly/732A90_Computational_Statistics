@@ -1,5 +1,7 @@
 LAB5================================================
-For the bootstrap in question 1, you need to randomly sample only Y, instead of pairs of (x,y). This way, you will get a proper p-value because you are simulating from the distribution under the null hypothesis (when H0: Lottery is random).
+For the bootstrap in question 1, you need to randomly sample only Y, 
+instead of pairs of (x,y). This way, you will get a proper p-value 
+because you are simulating from the distribution under the null hypothesis (when H0: Lottery is random).
 
 
 
