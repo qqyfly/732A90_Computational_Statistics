@@ -39,7 +39,7 @@ g_1_1
 
 Fitting the points using lm() and loess(), the plot is as below.
 
-According to the plot, we can find that the lm fit line and loess fit line is not flat, 
+According to the plot, we can find that the lm fit line(red) and loess fit line(blue) is not flat, 
 meanwhile, when Day_of_Year value is greater than 100, the smoothness of loess line has a trend to increase.
 
 So we can guess that the distribution of data may not be random.
@@ -67,9 +67,8 @@ y_1_2_loess <- predict(fit1_2_loess, newdata = data.frame(Day_of_year = x_1_2))
 data_1_2 <- data.frame(Day_of_year = x_1_2, y_lm = y_1_2_lm, y_loess = y_1_2_loess)
 
 g_1_1 + 
-geom_line(data = data_1_2, aes(x = Day_of_year, y = y_lm,colour="lm")) +
-geom_line(data = data_1_2, aes(x = Day_of_year, y = y_loess, colour = "loess")) + 
-scale_color_manual(name = "method", values = c("lm" = "blue", "loess" = "red")) 
+geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "red") +
+geom_smooth(method = "loess", formula = y ~ x, se = FALSE, color = "blue") 
 ```
 
 ### (1.3) Estimate S’s distribution through a non–parametric bootstrap
@@ -311,133 +310,157 @@ library(boot)
 
 ### (2.1)
 
-we create a scatter plot of SqFt versus Price, and fit a line.Price = 69.30663 + 0.60457 * SqFt
+we create a scatter plot of SqFt versus Price, and fit a line using linear regression.
 
-
-```{r 2.1}
+```{r 2.1, echo=FALSE}
 ################################## (2.1) #######################################
-data <- read.csv("prices1.csv", sep = ";")
+price_data <- read.csv("prices1.csv", sep = ";", header = TRUE)
 
-g_2_1 <- ggplot(data, aes(x = SqFt, y = Price)) + geom_point()
 
-# fit a linear regression model
-fit2_1_lm <- lm(Price ~ SqFt, data = data)
-summary(fit2_1_lm)
+ggplot(price_data, aes(x = SqFt, y = Price)) + 
+geom_point() + 
+geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "red") 
 
-minimal_x <- min(data$SqFt)
-maximum_x <- max(data$SqFt)
-
-x_2_1_lm <- seq(minimal_x, maximum_x, 0.1)
-y_2_1_lm <- predict(fit2_1_lm, newdata = data.frame(SqFt = x_2_1_lm))
-
-data_2_1 <- data.frame(SqFt = x_2_1_lm, Price = y_2_1_lm)
-
-g_2_1 + geom_line(data = data_2_1, aes(x = x_2_1_lm, y = y_2_1_lm), color = "red") 
-
+linear_model <- lm(Price ~ SqFt, data = price_data)
+summary(linear_model)
 ```
-According to the plotted line, it does not seem like a good fit. since the left bottom of the plot is very dense, but top right corner is very sparse.
+According to the output, the linear model is as follows:
+
+Price = 69.30663 + 0.60457 * SqFt
+
+According to the plotted line, it does not seem like a good fit. 
+since the left bottom of the plot is very dense, but top right corner is very sparse and those 
+points not close to the linear fit line.
 
 ### (2.2)
-According to the question, we need to min RSS as follows
+Please check code in the appendix for reference.
 
-$$
-RSS = \sum{ (y_{i} - f(f(x_{i})))^{2} }
-$$
+The result is as follows.
 
-And the code implementation as follows.
+```{r 2.2, echo=FALSE}
+rss_fun <- function(par,data) {
 
-```{r 2.2}
-rss_fun <- function(par,SqFt,Price) {
-
-  a1 <- par[1]
-  a2 <- par[2]
-  b <- par[3]
+  b <- par[1]
+  a1 <- par[2]
+  a2 <- par[3]
   c <- par[4]
-  
+
+  SqFt <- data$SqFt
+  Price <- data$Price
+
   predicted <- ifelse(SqFt > c, b + a1 * SqFt + a2 * (SqFt - c), b + a1 * SqFt)
   
   rss <- sum((Price - predicted)^2)
   return(rss)
 }
 
-c_func <- function(c, SqFt, Price) {
-  # Init
-  init_pars <- c(2, 0.1, 50,c)
+# Init
+init_pars <- c(b = coef(linear_model)[1], a1 = coef(linear_model)[2], a2 = 0, c = 2000)
   
-  # Optimize using optim()
-  result <- optim(par = init_pars, rss_fun, SqFt = SqFt, Price = Price)
+# Optimize using optim()
+optim_result <- optim(par = init_pars, fn = rss_fun, data=price_data)
   
-  opt_pars <- result$par
-  rss <- result$value
-  
-  return(list(c = opt_pars, params = opt_pars, rss = rss))
-}
+opt_pars <- optim_result$par
+opt_rss <- optim_result$value
 
+b = opt_pars[1]
+a1 = opt_pars[2]
+a2 = opt_pars[3]
+c = opt_pars[4]
 
-c <- 150
-results <- c_func(c, SqFt = data$SqFt, Price = data$Price)
-results
+cat("The optimized b=", b, "\n")
+cat("The optimized a1=", a1, "\n")
+cat("The optimized a2=", a2, "\n")
+cat("The optimized c=", c, "\n")
+
+cat("The optimized linear model is", "\n")
+cat("Price =", b, "+(", a1, ")* SqFt + (", 
+    a2, ")* (SqFt -(", c, "))\n")
+cat("The optimized RSS=",opt_rss,"\n")
 ```
 
 ### (2.3)
-We estimate the distribution of c using bootstrap 
 
-```{r 2.3.1}
-stat1 <- function(data,vn){
-    data = as.data.frame(data[vn,])
-    res <- c_func(c, SqFt = data$SqFt, Price = data$Price)
-    return(res$param[4])
+```{r 2.3.1,echo=FALSE}
+stat_c <- function(data,indices){
+    boot_data = data[indices,]
+    res <- optim(init_pars, rss_fun, data = boot_data)
+    return(res$par[4])
 }
 
 set.seed(12345)
-res1 = boot(data, stat1, R=1000)
-res1
+boot_result <-  boot(price_data, statistic = stat_c, R=1000)
+var_boot_c <- var(boot_result$t)
+
+# plot boot_result
+plot(boot_result)
+cat("Bootstrap Variance of c:", var_boot_c, "\n")
 ```
 
-We calc the 95% confidence interval 
-```{r 2.3.2,warning=FALSE}
+We estimate the distribution of c using bootstrap, the following is the result.
 
-print(boot.ci(res1)) 
 
-# plot
-plot(res1)
+```{r 2.3.2,echo=FALSE,warning=FALSE}
+boot.ci(boot_result,type=c("perc","bca","norm"))
 ```
+
+According to the output of boot.ci(), we can find that the 95% confidence interval of c.
+
+(1350, 3225 ) if we use bootstrap percentile.
+
+(3011, 3559 )if we use bootstrap BCa.
+
+(2671, 4822 ) for normal approximation
+
 
 ### (2.4)
 Estimate the variance of c using the jackknife:
 
-```{r 2.4, eval=FALSE}
+```{r 2.4, echo=FALSE}
 # Jackknife Function
-jackknife <- function(data, fun) {
-  n <- length(data)
-  indices <- 1:n
+jackknife <- function(data, func) {
+  n <- nrow(data)  
   estimates <- numeric(n)
   
   for (i in 1:n) {
-    jackknife_sample <- data[-i]
-    estimates[i] <- fun(jackknife_sample)
+    data_sample <- data[-i,]
+    optim_result <- optim(init_pars, func, data = data_sample)
+    estimates[i] <- optim_result$par[4]
   }
   
-  bias_correction <- (n - 1) * mean(estimates) - fun(data)
-  
-  jackknife_var <- ((n - 1) / n) * sum((estimates - mean(estimates) - bias_correction)^2)
-  
-  return(list(estimates = estimates, jackknife_var = jackknife_var))
+  return(estimates)
 }
 
-# not working here,c_values
-
-jackknife_results <- jackknife(c_values, function(c_val) {
-  c_func(c_val, SqFt, Price)$params[1]
-})
+# perform jackknife
+jackknife_results <- jackknife(price_data, rss_fun)
 
 # Print Jackknife Results
-cat("Jackknife Estimates of c:", jackknife_results$estimates, "\n")
-cat("Jackknife Variance of c:", jackknife_results$jackknife_var, "\n")
+cat("Jackknife Variance of c:", var(jackknife_results), "\n")
 ```
 
+Compared with the bootstrap variance, the jackknife variance is little bigger than bootstrap variance.
+because jackknife only leave one observation out each time, when data is sensitive to outliers, 
+jackknife method can create more variability.
+
+While boot method resample with replacement, so it can reduce the effect of outliers.
+
+From the scatter plot, we can find some outliers existed, which maybe the reason cause the higher variance of jackknife.
+
 ### (2.5)
-N/A
+Compare the results of the confidence intervals from above, we find that
+BCa us the narrowest confidence interval, and normal is the widest confidence interval.
+
+It's because wider confidence interval indicates higher uncertainty in the estimate of the parameter.
+
+The BCa method is generally preferred when dealing with non-normal or skewed distributions, 
+and it provides bias correction and accounts for skewness. In our case, 
+several outliers existed, so the BCa method is more suitable.
+
+The first-order normal approximation, however, assumes normality. since in our dataset, 
+several outliers existed, so the normal approximation is not very accurate.
+
+The percentile method is very sensitive to outliers, so it's not very accurate in our case.
+
 
 \newpage
 # Appendix: Code for this report

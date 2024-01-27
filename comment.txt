@@ -1,15 +1,5 @@
 LAB5================================================
-For the bootstrap in question 1, you need to randomly sample only Y, 
-instead of pairs of (x,y). This way, you will get a proper p-value 
-because you are simulating from the distribution under the null hypothesis (when H0: Lottery is random).
-
-
-
 I don't see anything presented for questions 2.2-2.4, only the code for that. And 2.5 is missing.
-
-
-
-Please present what is instructed from the lab pdf, and resubmit the lab. 
 
 LAB6==================================================================
 The likelihood for the EM algorithm is incorrect, particularly the truncated exponential pdf that you derived. You seemed to divide the a pdf of regular exponential distribution by another pdf of exponential distribution, while it should be the pdf divided by cdf at c. The reason you might be able to use the maximum likelihood directly, is because you also have not properly calculated the expectation, which should consist of two different kinds of parameters, lambda and lambda_k. Since lambda_k is known, you need to maximize the function over lambda. Please use this information to revise the EM algorithm and resubmit.
