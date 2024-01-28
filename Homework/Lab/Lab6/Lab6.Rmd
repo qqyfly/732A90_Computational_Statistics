@@ -15,8 +15,8 @@ output: pdf_document
 ########################## Init code for question 1 ############################
 rm(list = ls())
 library(ggplot2)
-library(bitops)
-set.seed(12345)
+
+
 
 ```
 ### (1) 3 Encodings :
@@ -24,14 +24,15 @@ set.seed(12345)
 We define 3 encodings accordingly which can generate chess board and put queens on the board randomly.
 We also define some functions to print out the board layout.
 
-For simplicity, all encodings will be column b
+For simplicity, all encodings will be column based and can be converted to matrix for printing.
 
-Please check the code in appendix.
+Please check the code in the appendix.
 
 ```{r 1.1,echo=FALSE}
 ########################## Config Encoding Function 1.1 ############################
 # First encoding: n pairs encoding
-init_configuration_1 <- function(board_size = 8) {
+init_configuration_1 <- function() {
+
   configuration <- data.frame(x = c(), y = c())
   queen_count <- 0
   for (i in 1:board_size) {
@@ -50,7 +51,8 @@ init_configuration_1 <- function(board_size = 8) {
 
 # Second Encoding: binary encoding
 # if board_size = 8, then the max n is 2^8 - 1 = 255
-init_configuration_2 <- function(board_size = 8,max_try_count = 1000) {
+init_configuration_2 <- function(max_try_count = 1000) {
+
   max_value <- 2^board_size - 1
   queen_count <- 0
   configuration <- rep(0, board_size)
@@ -74,7 +76,8 @@ init_configuration_2 <- function(board_size = 8,max_try_count = 1000) {
 }
 
 # Third Encoding: vector position encoding
-init_configuration_3 <- function(board_size = 8) {
+init_configuration_3 <- function() {
+
   configuration <- sample(1:board_size, board_size)
   return(configuration)
 }
@@ -82,13 +85,13 @@ init_configuration_3 <- function(board_size = 8) {
 # convert encodings to matrix
 decode_config <- function(config, method = 1) {
   if (method == 1){#(x,y) encoding
-    n <- dim(config)[2]
+    n <- board_size
     mat <- matrix(0, nrow = n, ncol = n)
     for (i in 1:n) {
       mat[config[1,i], config[2,i]] <- 1
     }
   }else if (method == 2) {#binary encoding
-      n <- length(config)
+      n <- board_size
       mat <- matrix(0, nrow = n, ncol = n)
       for (j in 1:n) {
         number <- config[j]
@@ -98,7 +101,7 @@ decode_config <- function(config, method = 1) {
         }
       }
   }else if (method == 3){#vector position encoding
-    n <- length(config)
+    n <- board_size
     mat <- matrix(0, nrow = n, ncol = n)
     for (i in 1:n) {
       mat[config[i],i] <- 1
@@ -108,38 +111,22 @@ decode_config <- function(config, method = 1) {
   return(mat)
 }
 
-# convert  matrix to encodings
-encode_config <- function(mat,method = 1) {
-  n <- nrow(mat)[1]
-  if (method == 1){#(x,y) encoding
-    config <- data.frame(x = c(), y = c())
-    for(i in 1:n){
-      for(j in 1:n){
-        if (mat[i,j] == 1){          
-          config$x <- c(config$x,i)
-          config$y <- c(config$y,j)          
-        }
-      }
-    }
-  }else if (method == 2) {#binary encoding 
-    configuration <- rep(0, n)    
-    # n rows
-    for (i in 1:n) {
-      for(j in 1:n) {
-        config[i] <- config[i] + mat[i,j] * 2^(n - j)
-      }      
-    }
-  }else if (method == 3){#vector position encoding
-    configuration <- rep(0, n)    
+# convert  matrix to encoding 1 (x,y) pair
+encode_config <- function(mat) {
+  n <- board_size
+  #(x,y) encoding 
+  config <- data.frame(x = rep(0,n), y = rep(0,n))
+  index = 1
+  for(i in 1:n){
     for(j in 1:n){
-      for(i in 1:n){
-        if (mat[i,j] == 1){          
-          config[j] <- i
-        }
+      if (mat[i,j] == 1){          
+        config[index,1] <- i
+        config[index,2] <- j
+        index <- index + 1
       }
     }
   }
-
+  config <- t(config)
   return(config)
 }
 
@@ -147,7 +134,7 @@ encode_config <- function(mat,method = 1) {
 print_board <- function(configuration, method = 1) {
   config <- decode_config(configuration, method)
 
-  n <- dim(config)[1]
+  n <- board_size
   for(i in 1:n) {
     for(j in 1:n) {
       if(config[i, j] == 1) {
@@ -177,40 +164,40 @@ print_board <- function(configuration, method = 1) {
 board_size <- 8
 
 print("Test Encoding 1")
-configuration <- init_configuration_1(board_size)
+configuration <- init_configuration_1()
 configuration
+
 print_board(configuration, 1)
 
 print("Test Encoding 2")
-configuration <- init_configuration_2(board_size)
+configuration <- init_configuration_2()
 configuration
+
 print_board(configuration, 2)
 
 print("Test Encoding 3")
-configuration <- init_configuration_3(board_size)
+configuration <- init_configuration_3()
 configuration
+
 print_board(configuration, 3)
 ```
 
 ### (2) Crossover function: 
 
 Crossover function call result listed below.
+Output below shows that the crossover function works as expected.
+First 2 chess board are the parents and the last one is the child.
 For source code, please check the appendix.
 
 ```{r 1.2, echo=FALSE}
 ########################## Crossover Function ############################
 crossover <- function(config1, config2,method = 1, p = 4){
-  if (method == 1){
-    boardsize <- ncol(config1)
-  }else{
-    boardsize <- length(config1)
-  }
-
+  
   child_config <- config1
   if (method == 1){
-    child_config[,(p+1):boardsize] = config2[,(p+1):boardsize]
+    child_config[,(p+1):board_size] = config2[,(p+1):board_size]
   }else{
-    for(i in (p+1):boardsize){     
+    for(i in (p+1):board_size){     
       child_config[i] <- config2[i]
     }    
   }
@@ -220,10 +207,10 @@ crossover <- function(config1, config2,method = 1, p = 4){
 ```{r 1.2.1,echo=FALSE}
 ########################## Test Crossover Function Call ############################
 print("Test Crossover encoding 1")
-config1 <- init_configuration_1(board_size)
+config1 <- init_configuration_1()
 config1
 print_board(config1, 1)
-config2 <- init_configuration_1(board_size)
+config2 <- init_configuration_1()
 config2
 print_board(config2, 1)
 
@@ -231,23 +218,20 @@ print("Child encoding 1")
 child_config <- crossover(config1, config2, 1, 4)
 child_config
 print_board(child_config, 1)
-
 ```
 
 ### (3) Mutate functions:
 
-We mutate the 3 encodings using the following functions.
+We mutate 3 encodings using the mutate function.
+The basic idea is to move the queen to a lower position (Y axis
+if not occupied. Check code in appendix for details.
 
 ```{r 1.3, echo=FALSE}
 ########################## Mutate functions ############################
-
 mutate <- function(config,method = 1) {
-  if (method == 1){
-    boardsize <- ncol(config)
-  }else{
-    boardsize <- length(config)
-  }
-  
+
+  boardsize <- board_size
+ 
   mutate_config <- config
 
   if (method == 1){    
@@ -276,22 +260,24 @@ mutate <- function(config,method = 1) {
     }
     mutate_config[col_to_mutate] <- queen_integer
   }else if (method == 3){
-    col_to_mutate <- sample(1:boardsize, 1)
+    #col_to_mutate <- sample(1:boardsize, 1)
     
-    if (mutate_config[col_to_mutate] + 1 > boardsize){
-      mutate_config[col_to_mutate] <- 1
-    }else{
-      mutate_config[col_to_mutate] <- mutate_config[col_to_mutate] + 1
-    }
+    #mutate_config[col_to_mutate] <- mutate_config[col_to_mutate] + 1
+    
+    #if (mutate_config[col_to_mutate] > boardsize){
+    #  mutate_config[col_to_mutate] <- 1
+    #}    
+    mutate_config = sample(1:board_size, board_size)
   }
   
   return(mutate_config)
 }
+```
 
-```{r 1.3.1, echo=FALSE}
+```{r 1.3.1,echo=FALSE}
 ########################## Test Mutate functions ############################
 print("Test Mutate encoding 3")
-config1 <- init_configuration_3(board_size)
+config1 <- init_configuration_3()
 config1
 mutate_config <- mutate(config1, 3)
 mutate_config
@@ -300,8 +286,10 @@ mutate_config
 
 To calc the fitness value of each encoding, we need to implement 3 different functions.
 
-For the binary encoding, we restricted that every row must have a queen and only one queen to make check function easier to implement.
-```{r 1.4}
+For the binary encoding, we restricted that every row must have a queen and only one queen
+ to make check function easier to implement.
+
+```{r 1.4,echo=FALSE}
 ########################## Common Function ############################
 # common functions for fitness function
 # check attack between queen position
@@ -318,8 +306,8 @@ is_attack <- function(queen1, queen2) {
 
 # check whole config is valid or not and return 
 # attacked queens number and unattacked queens number
-fitness <- function(config) {
-  queen_num <- nrow(config)
+fitness_base <- function(config) {
+  queen_num <- board_size
   attacked_queens <- c()
 
   for (i in 1:(queen_num - 1)) {
@@ -334,154 +322,162 @@ fitness <- function(config) {
   num_unattacked_queens <- length(unattacked_queens)
   valid <- (length(unique(attacked_queens)) == 0)
 
-  return(list(valid = valid,
-              num_unattacked_queens = num_unattacked_queens, 
-              num_attacked_queens = queen_num - num_unattacked_queens))
+  return(queen_num - num_unattacked_queens)
+  #return(list(valid = valid,
+  #            num_unattacked_queens = num_unattacked_queens, 
+  #            num_attacked_queens = queen_num - num_unattacked_queens))
 }
 
-fitness1 <- function(config) {
-  return(fitness(config))
+fitness <- function(config, method = 1) {
+  if (method == 1){
+    return(fitness_base(t(config)))
+  }else if (method == 2){
+    # convert encoding to (x,y) encoding
+    mat <- decode_config(config, method)    
+    config <- encode_config(mat)
+    return(fitness_base(t(config)))
+  }else if (method == 3){
+    # convert vector position encoding to (x,y) encoding
+    mat <- decode_config(config, 3)  
+    config <- encode_config(mat)  
+    return(fitness_base(t(config)))
+  }
 }
 
-fitness2 <- function(config) {
-  # convert binary encoding to (x,y) encoding
-  mat <- decode_config(config, 2)
-  config <- encode_config(mat, 1)
-  return(fitness(config))
-}
 
-fitness3 <- function(config) {
-  # convert vector position encoding to (x,y) encoding
-  mat <- decode_config(config, 3)
-  config <- encode_config(mat, 1)
-  return(fitness(config))
+fitness1111 <- function(config, method = 1) {
+  if (method == 1){
+    return(fitness_base(t(config)))
+  }else if (method == 2){
+    # convert encoding to (x,y) encoding
+    mat <- decode_config(config, method)    
+    config <- encode_config(mat)    
+    return(fitness_base(t(config)))
+  }else if (method == 3){
+    # convert vector position encoding to (x,y) encoding
+    mat <- decode_config(config, 3)  
+    config <- encode_config(mat)  
+    return(fitness_base(t(config)))
+  }
 }
+```
+
+```{r 1.4.1,echo=FALSE}
+########################## Test Code for Fitness Function ############################
+print("Test Fitness encoding 3")
+set.seed(123)
+config1 <- init_configuration_3()
+print(config1)
+print_board(config1, 3)
+cat ("unsafe queens number:",fitness(config1,3),"\n")
+
 ```
 
 ### (5)(6)(7):
-The genetic_algorithm implemented as follows
-```{r 1.5}
-#####################   genetic_algorithm  ###################################
-genetic_algorithm <- function(method = 1,board_size=8){
-  if (method == 1){
-    configuration_1 <- init_configuration_1(board_size)
-    val_1 <- fitness1(configuration_1)
-  } else if (method == 2){
-    configuration_1 <- init_configuration_2(board_size)
-    val_1 <- fitness2(configuration_1)
-  }else{
-    configuration_1 <- init_configuration_3(board_size)
-    val_1 <- fitness3(configuration_1)
-  }
+The genetic_algorithm implemented and listed in the appendix
 
+```{r 1.5,echo=FALSE}
+#####################   genetic_algorithm  ###################################
+genetic_algorithm <- function(method = 1,max_steps = 10000){
+  
+  configuration_1 <- init_configuration_1()
+  val_1 <- fitness(configuration_1,method)
+   
   configuration_2 <- NULL
 
-  max_steps <- 1000
+  
   steps <- 0
 
-  num_attacked_queens_vector <- c(val_1$num_attacked_queens)
-
-  while(val_1$num_attacked_queens != 0 && steps <= max_steps ) {
-
-    if (is.null(configuration_2)){
-      if (method == 1){
-        configuration_2 <- init_configuration_1(board_size)    
-        val_2 <- fitness1(configuration_2)
-      }else if(method == 2){
-        configuration_2 <- init_configuration_2(board_size)    
-        val_2 <- fitness2(configuration_2)
-      }else{
-        configuration_2 <- init_configuration_3(board_size)    
-        val_2 <- fitness3(configuration_2)
-      }
-    }
+  unsafe_queens_vector <- c()
+  
+  while(val_1 != 0 && steps <= max_steps ) {
+     if (is.null(configuration_2)){
+       if (method == 1){
+         configuration_2 <- init_configuration_1()    
+         val_2 <- fitness(configuration_2,1)
+       }else if(method == 2){
+         configuration_2 <- init_configuration_2()    
+         val_2 <- fitness(configuration_2,2)
+       }else{
+         configuration_2 <- init_configuration_3()    
+         val_2 <- fitness(configuration_2,3)
+       }
+     }
     
     # cross over
+    
     child_config <- crossover(configuration_1, 
-                              configuration_2,  
+                              configuration_2,
+                              method = method,  
                               p = p_val)
   
-    # mutate
-    if (method == 1){
-      mutated_config <- mutate(child_config,method=1)
-      val_child <- fitness1(mutated_config)
-
-    } else if (method == 2){
-      mutated_config <- mutate(child_config,method=2)
-      val_child <- fitness2(mutated_config)
-    } else {
-      mutated_config <- mutate(child_config,method=3)
-      val_child <- fitness3(mutated_config)
-    }
-        
-    configs <- c(1,2,3)
-    num_attacked_queens <- c(val_1$num_attacked_queens,
-                      val_2$num_attacked_queens,
-                      val_child$num_attacked_queens)
-    df <- data.frame(config = configs, 
-                    num_attacked_queens = num_attacked_queens)
-
-    custom_order <- order(df$num_attacked_queens)
-    sorted_df <- df[custom_order, ]
+    # mutate    
+    mutated_config <- mutate(child_config,method=method)
+    val_child <- fitness(mutated_config,method)
     
-    # choose minial 2 values
-    if (sorted_df$config[1] == 1){
-      configuration_1 <- configuration_1
-      val_1 <- val_1
-    }else if(sorted_df$config[1] == 2){
-      configuration_1 <- configuration_2
-      val_1 <- val_2
-    }else {
-      configuration_1 <- mutated_config
-      val_1 <- val_child
-    }
+    
+    configs = list(configuration_1,
+                   configuration_2,
+                   mutated_config)
 
-    if (sorted_df$config[2] == 1){
-      configuration_2 <- configuration_1
-      val_2 <- val_1
-    }else if(sorted_df$config[2] == 2){
-      configuration_2 <- configuration_2
-      val_2 <- val_2
-    }else {
-      configuration_2 <- mutated_config
-      val_2 <- val_child
-    }
+    unsafe_queens_num <- c(val_1,
+                       val_2,
+                       val_child)
+    df <- data.frame(unsafe_queens = unsafe_queens_num,
+                     configid = c(1,2,3))
+    
+    custom_order <- order(df$unsafe_queens, decreasing = FALSE)
+    sorted_df <- df[custom_order, ]    
 
-    num_attacked_queens_vector <- c(num_attacked_queens_vector,val_1$num_attacked_queens)
+    configuration_1 <- configs[[sorted_df$configid[1]]]
+    configuration_2 <- configs[[sorted_df$configid[2]]]
+    val_1 <- fitness(configuration_1,method)
+    val_2 <- fitness(configuration_2,method)
+ 
+    unsafe_queens_vector <- c(unsafe_queens_vector,sorted_df$unsafe_queens[1])
     steps <- steps + 1
-    
   }
-
-  # print the queen position if found the solution
-  if (val_1$num_attacked_queens == 0){
-    print_board(configuration_1, 3)
+  
+  #print the queen position if found the solution
+  if (unsafe_queens_vector[length(unsafe_queens_vector)] == 0){
+   cat("solution found after try ",steps," times\n")
+   print_board(configuration_1, method)
   }else{
-    print("not found the solution")
+   print(paste("No solution found after try ",max_steps," times"))
   }
 
-  #df <- data.frame(steps = 1:length(num_attacked_queens_vector),
-  #                  num_attacked_queens = num_attacked_queens_vector)
-  #ggplot(data=df, aes(x = steps, y = num_attacked_queens)) + geom_line()
-
+  df <- data.frame(steps = 1:length(unsafe_queens_vector),
+                     unsafe_queens_vector = unsafe_queens_vector)
+  ggplot(data=df, aes(x = steps, y = unsafe_queens_vector)) + geom_line()
 }
-
-p_val <- 3
-genetic_algorithm(method=3,board_size=8)
 ```
 
 ### (8):
-```{r 1.8,eval=FALSE}
-p_val <- 2
-genetic_algorithm(method=3,board_size=4)
+```{r 1.8}
 p_val <- 4
-genetic_algorithm(method=3,board_size=8)
-p_val <- 8
-genetic_algorithm(method=3,board_size=16)
+board_size <- 8
+genetic_algorithm(method=3,max_steps = 1000)
+
+board_size <- 10
+genetic_algorithm(method=3,max_steps = 10000)
+
 ```
 
 ### (9):
 
-Since we did not get a reasonable plot, so we don't comment here.
+Accoring to the code, we know that the 3rd one is the easiest to implement.
+Since it is a vector position encoding, which need to small memory space and 
+also easy to implement the crossover and mutate function.
+
+The 2nd one is the hardest to implement, since it is a binary encoding, to 
+simplify, for every column, we only have one queen, which means the binary
+string will have the form as "00000001" , "10000000", "00010000".
+For "11001100" is forbidden, since if it's hard to generate a valid configuration
+even if we create chess board layout. 
+
+For the 1st one, easy to understand, but has the same problem as the 2nd one,because
+we can have multiple queens in the same column/rows even if we can random the layout 
+using cross over and mutate function.and very easy to exceed the max try count.
 
 ## Question 2: EM algorithm (Solved by Satya Sai Naga Jaya Koushik Pilla)
 
@@ -491,7 +487,7 @@ Since we did not get a reasonable plot, so we don't comment here.
 ########################## Init code for question 1 ############################
 rm(list = ls())
 library(ggplot2)
-set.seed(12345)
+set.seed(123415)
 ```
 ### (1) Plot 2 histograms:
 
@@ -530,172 +526,190 @@ According to the plot, we know that time is greater than 0, so we omit the condi
 We have 2 types of observations here, one is censored(cens=1) and the other is not censored(cens=2).
 
 When cens=1 which means we find the failure immediately, 
-so the likelihood function is same as the exponential distribution which is 
+so the contribution of a single censered point $x_{i}$ to the likelihood is: $f(x_{i},\lambda)$
+
+When cens=2 which means we find the failure after a period of time,this time will 
+be the check interval. which means the contribution of a single uncensered point $x_{j}$ 
+to the likelihood is: $f(x_{j} | X < x_{j})$, which is given by.
 
 $$
-L(x,\lambda) = \lambda e^{-\lambda x}
+F(x_{j} | X < x_{j}) = \frac{F(x_{j})}{f(x_{j})} = \frac{\lambda e^{-\lambda x_{j}}}{1-e^{-\lambda x_{j}}}
 $$
 
-When cens=2 which means we find the failure after a period of time, the maximum time will 
-be the check interval. The likelihood function is a truncated exponential distribution.
+So the overrall likelihood function is the product of two likelihood for all points in our dataset.
 
-which is as follows.
-
-$$
-L(\lambda) = \lambda e^{-\lambda x}
-$$
-
-Likelihood function for the exponential distribution is as follows.
+Let's set U is the set of uncensored points set and C is the set of censored points set. 
+Then we have
 
 $$
-L(\lambda; x_{1},x_{2}...x_{n}) = \prod{f(x,\lambda)} = \lambda^{n} exp(-\lambda \sum_{j=1}^{n}x_{j})
+L(\lambda, U, C) = \prod_{U}f(x_{i},\lambda) \prod_{C} f(x_{i}|X \leq x_{j}) = 
+\prod_{U} \lambda e^{-\lambda x_{i}} \prod_{C} \frac{\lambda e^{-\lambda x_{j}}}{1-e^{-\lambda x_{j}}}
 $$
 
-
-So likelihood function for the truncated exponential distribution is as follows.
+Apply log on both sides ,we have the log likelihood function as follows.
 
 $$
-L(\lambda|X \leq c; x_{1},x_{2}...x_{n}) = \prod{P(X \leq x | X \leq c)} = (\frac{\lambda^{n}}{c^{n}}) exp(-\lambda \sum_{j=1}^{n}x_{j})
+logL(\lambda, U, C)  = \sum_{U} log(\lambda e^{-\lambda x_{i}}) + \sum_{C} log(\frac{\lambda e^{-\lambda x_{j}}}{1-e^{-\lambda x_{j}}})
+$$
+
+$$
+logL(\lambda, U, C) = \sum_{U} (log(\lambda) - \lambda x_{i}) + \sum_{C} (log(\lambda) - \lambda x_{j} - log(1-e^{-\lambda x_{j}}))
 $$
 
 ### (3):
 
-Since it's relative straight forward , we will use the likelihood function directly.
-
-So we will derive the EM function using the likelihood function in 2.2.
-
-E-Step:
-
-Let's compute the expectation of likelihood as follows.
+We derivative on likelihood function in 2.2, and we get the following function.
 
 $$
-Q(\lambda,{\lambda}^{t}) = E(L(\lambda|X \leq c; x_{1},x_{2}...x_{n}),{\lambda}^{t})
+\frac{d}{d\lambda}logL(\lambda, U, C) =  \sum_{U} (1 - x_{i}) + \sum_{C} (1 - x_{j}) +
+\sum_{C} \frac{x_{j}e^{-\lambda x_{j}}}{1- e^{-\lambda x_{j}}}
 $$
 
-M-Step:
-
-In M Step , we need to maximum Q with respect to  $\lambda$.
-
-$$
-\lambda^{t+1} = argmax_{\lambda} Q(\lambda,{\lambda}^{t})
-$$
+After rerange the terms, we get the $\lambda$ expression as follows.|U| and |C| are the number of
+uncensored points and censored points respectively.
 
 $$
-Q(\lambda,{\lambda}^{t}) = E(L(\lambda|X \leq c; x_{1},x_{2}...x_{n}),{\lambda}^{t})
+\lambda = \frac{|U| + |C|} {\sum_{U}x_{i} + \sum_{C}x_{j} - \sum_{C} \frac{x_{j}e^{-\lambda x_{j}}}{1- e^{-\lambda x_{j}}}}
 $$
+
+which can be used in E-Step in our EM algorithm.
 
 ### (4):
-According to the output, we know that estimated lambda: 7.80785 and Number of iterations: 6
-```{r 2.4}
-estep <- function(lambda, x, c) {
-  return(lambda / c * exp(-lambda * x))
-}
 
-# Function to compute the M-step
-mstep <- function(lambda, x, c) {
-  return(sum(x) / sum(c * exp(-lambda * x)))
+According to the formula in 2.3, we can implement the EM algorithm. The result is as follows.
+
+```{r 2.4,echo=FALSE}
+log_likelihood <- function(lambda, data) {
+  censor_data <- data[data$cens == 1,]
+  unsensor_data <- data[data$cens == 2,]
+
+  ll_censor <- sum(log(lambda) - censor_data$time * lambda)
+  ll_unsensor <- sum(
+                log(lambda) - 
+                unsensor_data$time * lambda -             
+                log(1 - exp(-lambda * unsensor_data$time)))
+  ll <- ll_censor + ll_unsensor
+  ll        
 }
 
 # EM algorithm
-em_algorithm <- function(initial_lambda, observed_data, truncation_point, max_iter = 100, tol = 0.001) {
-  lambda_current <- initial_lambda
+em_algorithm <- function(init_lambda=100, 
+                        data,                         
+                        max_iter = 1000, 
+                        epsilon = 0.001) {
   
+  lambda <- init_lambda
+  ll_values <- c()
+
   for (iter in 1:max_iter) {
-    # E-step
-    expected_values <- estep(lambda_current, observed_data, truncation_point)
+    # E-step    
+    ll_values <- c(ll_values, log_likelihood(lambda, data))
     
     # M-step
-    lambda_next <- mstep(lambda_current, observed_data, expected_values)
-    
+    censored <- data[data$cens == 1,]
+    uncensored <- data[data$cens == 2,]
+
+    lambda_next <- nrow(data) / (
+         sum(censored$time) + 
+         sum(uncensored$time) - 
+         sum(
+              (uncensored$time * exp(-lambda * uncensored$time)) / (1-exp(-lambda * uncensored$time))
+            )         
+         )
+                    
     # Check for convergence
-    if (abs(lambda_next - lambda_current) < tol) {
+    if (abs(lambda_next - lambda) < epsilon) {
       break
     }
     
     # Update lambda for the next iteration
-    lambda_current <- lambda_next
+    lambda <- lambda_next
   }
   
-  return(list(lambda = lambda_current, iterations = iter))
+  return(list(lambda = lambda, iterations = iter))
 }
-
-set.seed(12345)
-truncation_point <- 2
 
 # Initial guess for lambda
 initial_lambda <- 100
 
 # Run EM algorithm
-result <- em_algorithm(initial_lambda, filtered_data, truncation_point)
+em_result <- em_algorithm(initial_lambda, data)
 
 # Print the result
-cat("Estimated lambda:", result$lambda, "\n")
-cat("Number of iterations:", result$iterations, "\n")
+cat("Estimated lambda:", em_result$lambda, "\n")
+cat("Number of iterations:", em_result$iterations, "\n")
 ```
 
 ### (5):
 
-Density curve of truncated exp as follows.
+Density curve are as follows.
 
-```{r 2.5}
+```{r 2.5,echo=FALSE}
+layout(matrix(c(1:2), 1, 2))
+hist(data$time, breaks = 100,main="Hist of censored data")
+curve(dexp(x, rate = em_result$lambda), add = TRUE, col = "blue")
 
-estimated_lambda <- result$lambda
-
-truncated_exp_density <- function(x, lambda, c) {
-  return(lambda * exp(-lambda * x) / (1 - exp(-lambda * c)))
-}
-
-x_values <- seq(0, 5, length.out = 100)
-curve(truncated_exp_density(x, estimated_lambda, truncation_point), col = "red", lwd = 2, add = FALSE, from = 0, to = 5)
+hist(filtered_data$time, breaks = 100, main="Hist of filtered data")
+curve(dexp(x, rate = em_result$lambda), add = TRUE, col = "blue")
 ```
 
 ### (6):
-The code as follows.
-```{r 2.6}
 
-# Function to calculate MLE for truncated exponential distribution
-mle_truncated_exp <- function(data, c) {
-  n <- length(data)
-  lambda_hat <- n / sum(data)
-  return(lambda_hat)
-}
+```{r 2.6,echo=FALSE,warning=FALSE}
 
-# Function to generate bootstrap samples
-generate_bootstrap_samples <- function(data, num_bootstrap) {
-  bootstrap_samples <- vector("list", length = num_bootstrap)
+bootstrap <- function(lambda, data, num_bootstrap) {
+
+  em_lambda <- numeric(num_bootstrap)
+  mle_lambda <- numeric(num_bootstrap)
+
   for (i in 1:num_bootstrap) {
-    bootstrap_samples[[i]] <- sample(data, replace = TRUE)
-  }
-  return(bootstrap_samples)
-}
+    boot_samples <- rexp(nrow(data), rate = lambda)
 
-# Function to perform MLE and parametric bootstrap
-perform_bootstrap <- function(observed_data, truncation_point, num_bootstrap) {
-  # MLE for original data
-  lambda_hat_original <- mle_truncated_exp(observed_data, truncation_point)
-  
-  # Generate bootstrap samples
-  bootstrap_samples <- generate_bootstrap_samples(observed_data, num_bootstrap)
-  
-  # Perform MLE for each bootstrap sample
-  lambda_hat_bootstrap <- sapply(bootstrap_samples, function(bootstrap_sample) {
-    mle_truncated_exp(bootstrap_sample, truncation_point)
-  })
-  
-  return(list(lambda_hat_original = lambda_hat_original, lambda_hat_bootstrap = lambda_hat_bootstrap))
+    censored <- numeric(nrow(data))
+    
+    censor_index <- sample(which(data$cens == 2), sum(data$cens == 2))
+    boot_samples[censor_index] <- runif(length(censor_index),0, boot_samples[censor_index])
+
+    censored[censor_index]  <- 2
+    censored[-censor_index] <- 1
+    em_df <- data.frame(time = boot_samples, cens = censored)
+    mle_df <- subset(em_df, cens == 2)
+
+    em_lambda[i] <- em_algorithm(data = em_df)$lambda
+    mle_lambda[i] <- 1 / mean(mle_df$time)
+  }
+  return (list(em_lambda = em_lambda, mle_lambda = mle_lambda))
 }
 
 # Set the number of bootstrap samples
 num_bootstrap <- 1000
 
-# Perform MLE and parametric bootstrap
-bootstrap_results <- perform_bootstrap(filtered_data, truncation_point, num_bootstrap)
+# perform bootstrap
+boot_result <- bootstrap(lambda = em_result$lambda, data = data, num_bootstrap = 1000)
 
-# Print the results
-cat("Original MLE Estimate:", bootstrap_results$lambda_hat_original, "\n")
-cat("Mean of Bootstrap Estimates:", mean(bootstrap_results$lambda_hat_bootstrap), "\n")
+# plot
+ggplot() + 
+geom_histogram(aes(x = boot_result$em_lambda, y = ..density..), 
+                 bins = 50, fill = "blue", alpha = 0.5) +
+geom_histogram(aes(x = boot_result$mle_lambda, y = ..density..), 
+                 bins = 50, fill = "red", alpha = 0.5) +
+xlab("lambda")
 
+
+
+
+
+# Print the result
+cat("EM lambda :", em_result$lambda, "\n")
+cat("Boot EM lambda:", mean(boot_result$em_lambda), "\n")
+cat("Boot MLE lambda:", mean(boot_result$mle_lambda), "\n")
+
+cat("Boot EM lambda variance:", var(boot_result$em_lambda), "\n")
+cat("Boot MLE lambda variance:", var(boot_result$mle_lambda), "\n")
 ```
+According to the output, the variance are csmall, MLE estimator has a smaller variance.
+But both are biased estimators.
+
 
 \newpage
 # Appendix: Code for this report
