@@ -530,10 +530,10 @@ so the contribution of a single censered point $x_{i}$ to the likelihood is: $f(
 
 When cens=2 which means we find the failure after a period of time,this time will 
 be the check interval. which means the contribution of a single uncensered point $x_{j}$ 
-to the likelihood is: $f(x_{j} | X < x_{j})$, which is given by.
+to the likelihood is: $f(x_{j} | X <= x_{j})$, which is given by.
 
 $$
-F(x_{j} | X < x_{j}) = \frac{F(x_{j})}{f(x_{j})} = \frac{\lambda e^{-\lambda x_{j}}}{1-e^{-\lambda x_{j}}}
+f(x_{j} | X <= x_{j}) = \frac{f(x_{j})}{F(x_{j})} = \frac{\lambda e^{-\lambda x_{j}}}  {1-e^{-\lambda x_{j}}}
 $$
 
 So the overrall likelihood function is the product of two likelihood for all points in our dataset.
