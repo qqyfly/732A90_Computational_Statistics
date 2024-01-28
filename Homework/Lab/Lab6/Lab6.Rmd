@@ -538,7 +538,7 @@ $$
 
 So the overrall likelihood function is the product of two likelihood for all points in our dataset.
 
-Let's set U is the set of uncensored points set and C is the set of censored points set. 
+Let's set U is the set of uncensored points(original exp distribution) set and C is the set of censored points set(which need to consider conditional distribution). 
 Then we have
 
 $$
